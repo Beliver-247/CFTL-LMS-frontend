@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fa';
 
 export default function TeacherCompleteProfile() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -44,7 +45,7 @@ export default function TeacherCompleteProfile() {
     
     try {
       await axios.post(
-        'http://localhost:5000/api/teachers/profile',
+        `${baseURL}/api/teachers/profile`,
         {
           name: form.name,
           phone: form.phone,

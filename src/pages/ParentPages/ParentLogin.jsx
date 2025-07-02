@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaArrowRight } from 'react-icons/fa';
 
 export default function ParentLogin() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [nic, setNic] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +17,7 @@ export default function ParentLogin() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/parents', {
+      const res = await axios.post(`${baseURL}/api/auth/parents`, {
         nic,
         password,
       });

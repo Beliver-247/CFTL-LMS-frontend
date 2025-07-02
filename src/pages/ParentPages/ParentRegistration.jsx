@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function ParentRegister() {
+  const baseURL = process.env.REACT_APP_API_BASE_URL;
   const [form, setForm] = useState({
     name: '',
     nic: '',
@@ -20,7 +21,7 @@ export default function ParentRegister() {
     setError('');
 
     try {
-      await axios.post('http://localhost:5000/api/parents', form);
+      await axios.post(`${baseURL}/api/parents`, form);
       alert('Parent registered successfully!');
       navigate('/parent-login');
     } catch (err) {

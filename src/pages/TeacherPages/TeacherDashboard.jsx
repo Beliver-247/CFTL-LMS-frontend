@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 
 export default function TeacherDashboard() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function TeacherDashboard() {
       }
 
       try {
-        const res = await axios.get('http://localhost:5000/api/teachers/profile', {
+        const res = await axios.get(`${baseURL}/api/teachers/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(res.data);

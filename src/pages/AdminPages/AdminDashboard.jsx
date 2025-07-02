@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 
 export default function AdminDashboard() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [admin, setAdmin] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
       }
 
       try {
-        const res = await axios.get("http://localhost:5000/api/admins/me", {
+        const res = await axios.get(`${baseURL}/api/admins/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAdmin(res.data);
@@ -48,7 +49,7 @@ export default function AdminDashboard() {
 
     try {
       const token = localStorage.getItem("adminToken");
-      await axios.delete("http://localhost:5000/api/admins/me", {
+      await axios.delete(`${baseURL}/api/admins/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       localStorage.removeItem("adminToken");

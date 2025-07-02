@@ -15,6 +15,7 @@ import {
 import { FcGoogle } from 'react-icons/fc';
 
 export default function AdminLogin() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -56,7 +57,7 @@ export default function AdminLogin() {
 
   const checkProfileAndNavigate = async (token) => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admins/me', {
+      const res = await axios.get(`${baseURL}/api/admins/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const { fullName, nameInitials, telephone } = res.data;

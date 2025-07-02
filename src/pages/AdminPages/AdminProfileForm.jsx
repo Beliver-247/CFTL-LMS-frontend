@@ -5,6 +5,7 @@ import { auth } from '../../firebase';
 
 
 export default function AdminProfileForm() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [form, setForm] = useState({
     fullName: '',
     nameInitials: '',
@@ -48,7 +49,7 @@ export default function AdminProfileForm() {
 
   try {
     const token = localStorage.getItem('adminToken');
-    await axios.post('http://localhost:5000/api/admins', formData, {
+    await axios.post(`${baseURL}/api/admins`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'

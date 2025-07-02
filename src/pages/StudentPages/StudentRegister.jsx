@@ -43,6 +43,7 @@ const initialFormState = {
 };
 
 export default function StudentRegister() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [form, setForm] = useState(initialFormState);
   const [latestRegNo, setLatestRegNo] = useState(null);
   const [error, setError] = useState("");
@@ -51,9 +52,8 @@ export default function StudentRegister() {
   useEffect(() => {
     const fetchLatestRegNo = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/students/latest-regno"
-        );
+        const res = await axios.get(`${baseURL}/api/students/latest-regno`);
+
         const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD format
 
         setLatestRegNo(res.data.registrationNo);
@@ -105,10 +105,8 @@ export default function StudentRegister() {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/students",
-        dataToSend
-      );
+      const response = await axios.post(`${baseURL}/api/students`, dataToSend);
+
       const { registrationNo, registrationDate } = response.data;
 
       setSuccess(

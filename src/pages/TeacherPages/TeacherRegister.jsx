@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 
 export default function TeacherRegister() {
+  
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -24,6 +25,8 @@ export default function TeacherRegister() {
     salary: '',
     qualifications: '',
   });
+
+  const baseURL = process.env.REACT_APP_API_BASE_URL;
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -42,7 +45,7 @@ export default function TeacherRegister() {
       const token = await userCred.user.getIdToken();
 
       await axios.post(
-        'http://localhost:5000/api/teachers/profile',
+        `${baseURL}/api/teachers/profile`,
         {
           name: form.name,
           phone: form.phone,

@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 
 export default function ParentDashboard() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [students, setStudents] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function ParentDashboard() {
 
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/parents/children', {
+        const res = await axios.get(`${baseURL}/api/parents/children`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStudents(res.data || []);
