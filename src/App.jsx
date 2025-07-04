@@ -33,7 +33,6 @@ export default function App() {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin-complete-profile" element={<AdminCompleteProfile />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          {/* Add more routes as needed */}
         </Routes>
       </main>
     </div>
