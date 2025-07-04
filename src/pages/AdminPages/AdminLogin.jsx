@@ -7,11 +7,7 @@ import {
 } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {
-  FaUserShield,
-  FaEnvelope,
-  FaLock,
-} from 'react-icons/fa';
+import { FaUserShield, FaEnvelope, FaLock } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 
 export default function AdminLogin() {
@@ -23,12 +19,33 @@ export default function AdminLogin() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
+  // 🔍 Checks if user is invited before allowing profile access
+  const checkInvite = async (email) => {
+    try {
+      const res = await axios.get(`${baseURL}/api/admins/check-invite`, {
+        params: { email },
+      });
+      return res.status === 200;
+    } catch (err) {
+      return false;
+    }
+  };
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const userEmail = userCred.user.email;
+
+      const invited = await checkInvite(userEmail);
+      if (!invited) {
+        setError('You are not invited to access the admin portal.');
+        await auth.signOut();
+        return;
+      }
+
       const token = await userCred.user.getIdToken();
       localStorage.setItem('adminToken', token);
       await checkProfileAndNavigate(token);
@@ -45,6 +62,15 @@ export default function AdminLogin() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const userEmail = result.user.email;
+
+      const invited = await checkInvite(userEmail);
+      if (!invited) {
+        setError('You are not invited to access the admin portal.');
+        await auth.signOut();
+        return;
+      }
+
       const token = await result.user.getIdToken();
       localStorage.setItem('adminToken', token);
       await checkProfileAndNavigate(token);
@@ -58,16 +84,32 @@ export default function AdminLogin() {
   const checkProfileAndNavigate = async (token) => {
     try {
       const res = await axios.get(`${baseURL}/api/admins/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       const { fullName, nameInitials, telephone } = res.data;
+
       if (!fullName || !nameInitials || !telephone) {
         navigate('/admin-complete-profile');
       } else {
         navigate('/admin-dashboard');
       }
     } catch (err) {
-      navigate('/admin-complete-profile');
+      const status = err.response?.status;
+      const message = err.response?.data?.error;
+
+      if (status === 403 && message?.includes('Unauthorized')) {
+        setError('You are not authorized to access the admin portal.');
+        auth.signOut();
+        localStorage.removeItem('adminToken');
+        return;
+      }
+
+      if (status === 404) {
+        navigate('/admin-complete-profile');
+      } else {
+        setError('An unexpected error occurred.');
+      }
     }
   };
 

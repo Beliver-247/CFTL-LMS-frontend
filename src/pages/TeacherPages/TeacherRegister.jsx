@@ -26,7 +26,7 @@ export default function TeacherRegister() {
     qualifications: '',
   });
 
-  const baseURL = process.env.REACT_APP_API_BASE_URL;
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
