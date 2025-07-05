@@ -133,71 +133,79 @@ export default function AdminDashboard() {
         </div>
 
         {/* Dashboard Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Manage Students */}
-          <div
-            onClick={() => alert("Manage Students")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <FaUsers className="text-blue-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Students</h3>
-              <p className="text-gray-500 text-sm">
-                Add, update or remove students
-              </p>
-            </div>
-          </div>
+        {/* Dashboard Actions */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {/* Manage Students */}
+  <div
+    onClick={() => alert("Manage Students")}
+    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
+  >
+    <div className="bg-blue-100 p-3 rounded-full mr-4">
+      <FaUsers className="text-blue-600 text-xl" />
+    </div>
+    <div>
+      <h3 className="font-semibold text-lg">Manage Students</h3>
+      <p className="text-gray-500 text-sm">Add, update or remove students</p>
+    </div>
+  </div>
 
-          {/* Manage Teachers */}
-          <div
-            onClick={() => alert("Manage Teachers")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              <FaChalkboardTeacher className="text-green-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Teachers</h3>
-              <p className="text-gray-500 text-sm">
-                Assign subjects or edit teacher info
-              </p>
-            </div>
-          </div>
+  {/* Manage Teachers */}
+  <div
+    onClick={() => alert("Manage Teachers")}
+    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
+  >
+    <div className="bg-green-100 p-3 rounded-full mr-4">
+      <FaChalkboardTeacher className="text-green-600 text-xl" />
+    </div>
+    <div>
+      <h3 className="font-semibold text-lg">Manage Teachers</h3>
+      <p className="text-gray-500 text-sm">Assign subjects or edit teacher info</p>
+    </div>
+  </div>
 
-          {/* Manage Syllabus */}
-          <div
-            onClick={() => alert("Manage Syllabus")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-purple-100 p-3 rounded-full mr-4">
-              <FaBookOpen className="text-purple-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Syllabus</h3>
-              <p className="text-gray-500 text-sm">
-                Edit curriculum and course content
-              </p>
-            </div>
-          </div>
+  {/* Manage Syllabus */}
+  <div
+    onClick={() => alert("Manage Syllabus")}
+    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
+  >
+    <div className="bg-purple-100 p-3 rounded-full mr-4">
+      <FaBookOpen className="text-purple-600 text-xl" />
+    </div>
+    <div>
+      <h3 className="font-semibold text-lg">Manage Syllabus</h3>
+      <p className="text-gray-500 text-sm">Edit curriculum and course content</p>
+    </div>
+  </div>
 
-          {/* ✅ Manage Courses */}
-          <div
-            onClick={() => navigate("/admin/manage-courses")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-indigo-100 p-3 rounded-full mr-4">
-              <FaBookOpen className="text-indigo-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Courses</h3>
-              <p className="text-gray-500 text-sm">
-                Create, edit, or delete courses
-              </p>
-            </div>
-          </div>
-        </div>
+  {/* Manage Courses */}
+  <div
+    onClick={() => navigate("/admin/manage-courses")}
+    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
+  >
+    <div className="bg-indigo-100 p-3 rounded-full mr-4">
+      <FaBookOpen className="text-indigo-600 text-xl" />
+    </div>
+    <div>
+      <h3 className="font-semibold text-lg">Manage Courses</h3>
+      <p className="text-gray-500 text-sm">Create, edit, or delete courses</p>
+    </div>
+  </div>
+
+  {/* ✅ Manage Subjects */}
+  <div
+    onClick={() => navigate("/admin/manage-subjects")}
+    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
+  >
+    <div className="bg-orange-100 p-3 rounded-full mr-4">
+      <FaBookOpen className="text-orange-600 text-xl" />
+    </div>
+    <div>
+      <h3 className="font-semibold text-lg">Manage Subjects</h3>
+      <p className="text-gray-500 text-sm">Add, edit, or remove subjects</p>
+    </div>
+  </div>
+</div>
+
       </main>
     </div>
   );
