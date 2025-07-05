@@ -15,6 +15,12 @@ import AdminLogin from './pages/AdminPages/AdminLogin';
 import AdminCompleteProfile from './pages/AdminPages/AdminProfileForm';
 import AdminDashboard from './pages/AdminPages/AdminDashboard';
 import CoordinatorDashboard from './pages/CoordinatorPages/CoordinatorDashboard';
+import ManageCourses from './pages/CoursePages/ManageCourses';
+import CreateCourse from './pages/CoursePages/CreateCourse';
+import EditCourse from './pages/CoursePages/EditCourse';
+import CreateSubject from './pages/CoursePages/CreateSubject';
+import ManageSubjects from './pages/CoursePages/ManageSubjects';
+import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
 
 export default function App() {
   return (
@@ -35,15 +41,39 @@ export default function App() {
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/student-register" element={<StudentRegister />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route
+  path="/admin-login"
+  element={
+    <RedirectIfAuthenticated>
+      <AdminLogin />
+    </RedirectIfAuthenticated>
+  }
+/>
           <Route path="/admin-complete-profile" element={<AdminCompleteProfile />} />
           <Route
             path="/admin-dashboard"
             element={<ProtectedRoute element={AdminDashboard} allowedRoles={['admin']} />}
           />
           <Route
+            path="/admin/manage-courses"
+            element={<ProtectedRoute element={ManageCourses} allowedRoles={['admin']} />}
+          />
+          <Route
+            path="/admin/courses/create"
+            element={<ProtectedRoute element={CreateCourse} allowedRoles={['admin']} />}
+          />
+          <Route
+            path="/admin/courses/edit/:courseId"
+            element={<ProtectedRoute element={EditCourse} allowedRoles={['admin']} />}
+          />
+          <Route
             path="/coordinator-dashboard"
             element={<ProtectedRoute element={CoordinatorDashboard} allowedRoles={['coordinator']} />}
+          />
+          <Route path="/admin/subjects/create" element={<CreateSubject />} />
+          <Route
+            path="/admin/manage-subjects"
+            element={<ProtectedRoute element={ManageSubjects} allowedRoles={['admin']} />}
           />
         </Routes>
       </main>
