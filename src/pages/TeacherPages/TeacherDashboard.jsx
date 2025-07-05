@@ -10,7 +10,7 @@ import {
   FaClipboardList, 
   FaSignOutAlt,
   FaUser,
-  FaEnvelope,
+  FaEnvelope, 
   FaGraduationCap,
   FaDollarSign
 } from "react-icons/fa";
@@ -21,30 +21,30 @@ export default function TeacherDashboard() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/teacher-login');
-        return;
-      }
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('userRole');
 
-      try {
-        const res = await axios.get(`${baseURL}/api/teachers/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProfile(res.data);
-      } catch (err) {
-        if (err.response?.status === 404) {
-          navigate('/teacher-complete-profile');
-        } else {
-          setError('Failed to fetch profile');
-        }
-      }
-    };
+  if (!token || role !== 'parent') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    return navigate('/parent-login');
+  }
 
-    fetchProfile();
-  }, [navigate]);
+  const fetchStudents = async () => {
+    try {
+      const res = await axios.get(`${baseURL}/api/parents/children`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStudents(res.data || []);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not fetch child records.');
+    }
+  };
+
+  fetchStudents();
+}, [navigate]);
+
 
   if (error) return (
     <div className="flex items-center justify-center h-screen">

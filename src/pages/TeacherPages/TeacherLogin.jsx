@@ -26,6 +26,7 @@ export default function TeacherLogin() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
       localStorage.setItem('token', token);
+      localStorage.setItem('userRole', 'teacher');
       navigate('/teacher-dashboard');
     } catch (err) {
       setError(err.message.replace('Firebase: ', ''));

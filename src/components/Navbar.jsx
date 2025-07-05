@@ -1,29 +1,27 @@
-// components/Navbar.jsx
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaGraduationCap, 
-  FaUser, 
-  FaChalkboardTeacher, 
-  FaHome, 
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  FaGraduationCap,
+  FaUser,
+  FaChalkboardTeacher,
+  FaHome,
   FaBars,
-  FaTimes
+  FaTimes,
+  FaSignOutAlt
 } from 'react-icons/fa';
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userType, setUserType] = useState('guest');
   const path = location.pathname;
 
-  // Determine user type based on current path
-  const getUserType = () => {
-    if (path.startsWith('/teacher')) return 'teacher';
-    if (path.startsWith('/parent')) return 'parent';
-    if (path.startsWith('/student')) return 'student';
-    return 'guest';
-  };
-
-  const userType = getUserType();
+  // Determine userType from localStorage
+  useEffect(() => {
+    const role = localStorage.getItem('userRole') || 'guest';
+    setUserType(role);
+  }, [location]);
 
   // Common navigation items
   const commonItems = [
@@ -58,8 +56,13 @@ export default function Navbar() {
     ]
   };
 
-  // Combine common and role-specific items
   const navItems = [...commonItems, ...(roleItems[userType] || [])];
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    navigate('/');
+  };
 
   return (
     <nav className="bg-blue-900 text-white shadow-lg">
@@ -96,13 +99,14 @@ export default function Navbar() {
             <div className="ml-4 flex items-center md:ml-6">
               {userType !== 'guest' ? (
                 <>
-                  <span className="text-blue-200 mr-4">Welcome, {userType}</span>
-                  <Link
-                    to="/"
-                    className="px-4 py-2 bg-red-600 rounded-md text-sm font-medium hover:bg-red-700"
+                  <span className="text-blue-200 mr-4 capitalize">Welcome, {userType}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center px-4 py-2 bg-red-600 rounded-md text-sm font-medium hover:bg-red-700"
                   >
-                    Home
-                  </Link>
+                    <FaSignOutAlt className="mr-2" />
+                    Logout
+                  </button>
                 </>
               ) : (
                 <div className="flex space-x-2">
@@ -162,20 +166,19 @@ export default function Navbar() {
           <div className="pt-4 pb-3 border-t border-blue-800">
             {userType !== 'guest' ? (
               <div className="px-5">
-                <div className="flex items-center">
-                  <div className="ml-3">
-                    <div className="text-base font-medium text-white">Welcome, {userType}</div>
-                  </div>
+                <div className="text-base font-medium text-white capitalize mb-2">
+                  Welcome, {userType}
                 </div>
-                <div className="mt-3 px-2 space-y-1">
-                  <Link
-                    to="/logout"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-blue-200 hover:text-white hover:bg-blue-700"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Home
-                  </Link>
-                </div>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-blue-200 hover:text-white hover:bg-blue-700"
+                >
+                  <FaSignOutAlt className="inline mr-2" />
+                  Logout
+                </button>
               </div>
             ) : (
               <div className="px-2 space-y-1">

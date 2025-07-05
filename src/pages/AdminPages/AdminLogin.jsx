@@ -81,20 +81,24 @@ export default function AdminLogin() {
     }
   };
 
-  const checkProfileAndNavigate = async (token) => {
-    try {
-      const res = await axios.get(`${baseURL}/api/admins/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+const checkProfileAndNavigate = async (token) => {
+  try {
+    const res = await axios.get(`${baseURL}/admins/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      const { fullName, nameInitials, telephone } = res.data;
+    const { fullName, nameInitials, telephone, role } = res.data;
 
-      if (!fullName || !nameInitials || !telephone) {
-        navigate('/admin-complete-profile');
+    if (!fullName || !nameInitials || !telephone) {
+      navigate('/admin-complete-profile');
+    } else {
+      if (role === 'coordinator') {
+        navigate('/coordinator-dashboard');
       } else {
         navigate('/admin-dashboard');
       }
-    } catch (err) {
+    }
+  } catch (err) {
       const status = err.response?.status;
       const message = err.response?.data?.error;
 
