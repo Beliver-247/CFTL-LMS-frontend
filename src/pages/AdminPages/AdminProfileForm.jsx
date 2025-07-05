@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function AdminProfileForm() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -14,31 +15,29 @@ export default function AdminProfileForm() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkInviteAndRedirect = async () => {
-      const user = auth.currentUser;
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      navigate("/admin-login");
+      return;
+    }
 
-      if (!user) {
-        navigate("/admin-login");
-        return;
-      }
+    try {
+      const res = await axios.get(`${baseURL}/api/admins/check-invite`, {
+        params: { email: user.email },
+      });
 
-      try {
-        const res = await axios.get(`${baseURL}/api/admins/check-invite`, {
-          params: { email: user.email },
-        });
+      // ✅ Proceed — they are invited
+    } catch (err) {
+      // ❌ Not invited — sign them out and redirect
+      await auth.signOut();
+      localStorage.removeItem("adminToken");
+      navigate("/admin-login");
+    }
+  });
 
-        // ✅ Allowed — they are invited
-      } catch (err) {
-        // ❌ Not invited — sign them out and redirect
-        await auth.signOut();
-        localStorage.removeItem("adminToken");
-        navigate("/admin-login");
-      }
-    };
-
-    checkInviteAndRedirect();
-  }, [navigate]);
+  return () => unsubscribe();
+}, [navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

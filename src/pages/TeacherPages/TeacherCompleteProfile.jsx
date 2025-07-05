@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { auth } from '../../firebase';
-import { 
-  FaUser, 
-  FaPhone, 
-  FaChalkboardTeacher, 
-  FaMoneyBillWave, 
-  FaGraduationCap, 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { auth } from "../../firebase";
+import {
+  FaUser,
+  FaPhone,
+  FaChalkboardTeacher,
+  FaMoneyBillWave,
+  FaGraduationCap,
   FaEnvelope,
-  FaArrowRight
-} from 'react-icons/fa';
+  FaArrowRight,
+} from "react-icons/fa";
 
 export default function TeacherCompleteProfile() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    type: 'PERMANENT',
-    salary: '',
-    qualifications: '',
-    email: '',
+    name: "",
+    phone: "",
+    type: "PERMANENT",
+    salary: "",
+    qualifications: "",
+    email: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -40,9 +40,9 @@ export default function TeacherCompleteProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    const token = localStorage.getItem('token');
-    
+    setError("");
+    const token = localStorage.getItem("token");
+
     try {
       await axios.post(
         `${baseURL}/api/teachers/profile`,
@@ -51,8 +51,9 @@ export default function TeacherCompleteProfile() {
           phone: form.phone,
           type: form.type,
           salary: parseFloat(form.salary),
-          qualifications: form.qualifications.split(',').map(q => q.trim()),
+          qualifications: form.qualifications.split(",").map((q) => q.trim()),
           email: form.email,
+          role: "teacher", // ✅ Add this
         },
         {
           headers: {
@@ -60,9 +61,10 @@ export default function TeacherCompleteProfile() {
           },
         }
       );
-      navigate('/teacher-dashboard');
+
+      navigate("/teacher-dashboard");
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save profile');
+      setError(err.response?.data?.error || "Failed to save profile");
     } finally {
       setIsLoading(false);
     }
@@ -73,8 +75,12 @@ export default function TeacherCompleteProfile() {
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-blue-600 py-6 px-8 text-center">
           <FaChalkboardTeacher className="mx-auto text-4xl text-white mb-2" />
-          <h2 className="text-2xl font-bold text-white">Complete Your Profile</h2>
-          <p className="text-blue-100 mt-1">Finish setting up your teacher account</p>
+          <h2 className="text-2xl font-bold text-white">
+            Complete Your Profile
+          </h2>
+          <p className="text-blue-100 mt-1">
+            Finish setting up your teacher account
+          </p>
         </div>
 
         <div className="p-8">
@@ -87,7 +93,10 @@ export default function TeacherCompleteProfile() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Full Name
               </label>
               <div className="relative">
@@ -109,7 +118,10 @@ export default function TeacherCompleteProfile() {
 
             {/* Phone */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Phone Number
               </label>
               <div className="relative">
@@ -130,7 +142,10 @@ export default function TeacherCompleteProfile() {
 
             {/* Teacher Type */}
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="type"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Teacher Type
               </label>
               <select
@@ -147,7 +162,10 @@ export default function TeacherCompleteProfile() {
 
             {/* Salary */}
             <div>
-              <label htmlFor="salary" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="salary"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Salary (LKR)
               </label>
               <div className="relative">
@@ -169,7 +187,10 @@ export default function TeacherCompleteProfile() {
 
             {/* Qualifications */}
             <div>
-              <label htmlFor="qualifications" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="qualifications"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Qualifications
               </label>
               <div className="relative">
@@ -190,7 +211,10 @@ export default function TeacherCompleteProfile() {
 
             {/* Email (readonly) */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -213,14 +237,30 @@ export default function TeacherCompleteProfile() {
               type="submit"
               disabled={isLoading}
               className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
-                isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                isLoading ? "opacity-75 cursor-not-allowed" : ""
               }`}
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Saving...
                 </>

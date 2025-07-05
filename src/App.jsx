@@ -10,9 +10,11 @@ import TeacherCompleteProfile from './pages/TeacherPages/TeacherCompleteProfile'
 import ParentRegister from './pages/ParentPages/ParentRegistration';
 import ParentDashboard from './pages/ParentPages/ParentDashboard';
 import StudentRegister from './pages/StudentPages/StudentRegister';
+import ProtectedRoute from './components/ProtectedRoute';
 import AdminLogin from './pages/AdminPages/AdminLogin';
 import AdminCompleteProfile from './pages/AdminPages/AdminProfileForm';
 import AdminDashboard from './pages/AdminPages/AdminDashboard';
+import CoordinatorDashboard from './pages/CoordinatorPages/CoordinatorDashboard';
 
 export default function App() {
   return (
@@ -23,7 +25,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/parent-login" element={<ParentLogin />} />
           <Route path="/teacher-login" element={<TeacherLogin />} />
-          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+          <Route
+            path="/teacher-dashboard"
+            element={<ProtectedRoute element={TeacherDashboard} allowedRoles={['teacher']} />}
+          />
           <Route path="/teacher-register" element={<TeacherRegister />} />
           <Route path="/teacher-complete-profile" element={<TeacherCompleteProfile />} />
           <Route path="/parent-login" element={<ParentLogin />} />
@@ -32,7 +37,14 @@ export default function App() {
           <Route path="/student-register" element={<StudentRegister />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin-complete-profile" element={<AdminCompleteProfile />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route
+            path="/admin-dashboard"
+            element={<ProtectedRoute element={AdminDashboard} allowedRoles={['admin']} />}
+          />
+          <Route
+            path="/coordinator-dashboard"
+            element={<ProtectedRoute element={CoordinatorDashboard} allowedRoles={['coordinator']} />}
+          />
         </Routes>
       </main>
     </div>
