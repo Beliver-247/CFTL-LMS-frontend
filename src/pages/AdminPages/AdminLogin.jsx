@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { auth } from '../../firebase';
+import { useState } from "react";
+import { auth } from "../../firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-} from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { FaUserShield, FaEnvelope, FaLock } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
+} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { FaUserShield, FaEnvelope, FaLock } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 
 export default function AdminLogin() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ export default function AdminLogin() {
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
@@ -41,23 +41,23 @@ export default function AdminLogin() {
 
       const invited = await checkInvite(userEmail);
       if (!invited) {
-        setError('You are not invited to access the admin portal.');
+        setError("You are not invited to access the admin portal.");
         await auth.signOut();
         return;
       }
 
       const token = await userCred.user.getIdToken();
-      localStorage.setItem('adminToken', token);
+      localStorage.setItem("adminToken", token);
       await checkProfileAndNavigate(token);
     } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
+      setError(err.message.replace("Firebase: ", ""));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError('');
+    setError("");
     setGoogleLoading(true);
     try {
       const provider = new GoogleAuthProvider();
@@ -66,16 +66,16 @@ export default function AdminLogin() {
 
       const invited = await checkInvite(userEmail);
       if (!invited) {
-        setError('You are not invited to access the admin portal.');
+        setError("You are not invited to access the admin portal.");
         await auth.signOut();
         return;
       }
 
       const token = await result.user.getIdToken();
-      localStorage.setItem('adminToken', token);
+      localStorage.setItem("adminToken", token);
       await checkProfileAndNavigate(token);
     } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
+      setError(err.message.replace("Firebase: ", ""));
     } finally {
       setGoogleLoading(false);
     }
@@ -89,26 +89,26 @@ export default function AdminLogin() {
 
       const { fullName, nameInitials, telephone } = res.data;
 
-      if (!fullName || !nameInitials || !telephone) {
-        navigate('/admin-complete-profile');
+      if (!fullName?.trim() || !nameInitials?.trim() || !telephone?.trim()) {
+        navigate("/admin-complete-profile");
       } else {
-        navigate('/admin-dashboard');
+        navigate("/admin-dashboard");
       }
     } catch (err) {
       const status = err.response?.status;
       const message = err.response?.data?.error;
 
-      if (status === 403 && message?.includes('Unauthorized')) {
-        setError('You are not authorized to access the admin portal.');
+      if (status === 403 && message?.includes("Unauthorized")) {
+        setError("You are not authorized to access the admin portal.");
         auth.signOut();
-        localStorage.removeItem('adminToken');
+        localStorage.removeItem("adminToken");
         return;
       }
 
       if (status === 404) {
-        navigate('/admin-complete-profile');
+        navigate("/admin-complete-profile");
       } else {
-        setError('An unexpected error occurred.');
+        setError("An unexpected error occurred.");
       }
     }
   };
@@ -131,7 +131,10 @@ export default function AdminLogin() {
 
           <form onSubmit={handleEmailLogin} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -151,7 +154,10 @@ export default function AdminLogin() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Password
               </label>
               <div className="relative">
@@ -174,19 +180,35 @@ export default function AdminLogin() {
               type="submit"
               disabled={isLoading}
               className={`w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
-                isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                isLoading ? "opacity-75 cursor-not-allowed" : ""
               }`}
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Signing in...
                 </>
               ) : (
-                'Sign in with Email'
+                "Sign in with Email"
               )}
             </button>
           </form>
@@ -197,7 +219,9 @@ export default function AdminLogin() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -206,14 +230,30 @@ export default function AdminLogin() {
                 onClick={handleGoogleLogin}
                 disabled={googleLoading}
                 className={`w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
-                  googleLoading ? 'opacity-75 cursor-not-allowed' : ''
+                  googleLoading ? "opacity-75 cursor-not-allowed" : ""
                 }`}
               >
                 {googleLoading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                     Signing in...
                   </>

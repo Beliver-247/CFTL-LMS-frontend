@@ -41,7 +41,7 @@ export default function App() {
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/student-register" element={<StudentRegister />} />
-          <Route
+<Route
   path="/admin-login"
   element={
     <RedirectIfAuthenticated>
@@ -49,6 +49,7 @@ export default function App() {
     </RedirectIfAuthenticated>
   }
 />
+
           <Route path="/admin-complete-profile" element={<AdminCompleteProfile />} />
           <Route
             path="/admin-dashboard"
