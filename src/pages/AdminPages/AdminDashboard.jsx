@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase"; // Adjust the import path as necessary
+import { auth } from "../../firebase"; 
+import { getFreshToken } from "../../utils/authToken"; // Adjust the import path as necessary
 import {
   FaUser,
   FaEnvelope,
@@ -21,7 +22,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchAdmin = async () => {
-      const token = localStorage.getItem("adminToken");
+      const token = await getFreshToken();
       if (!token) {
         navigate("/admin-login");
         return;
@@ -44,23 +45,25 @@ export default function AdminDashboard() {
     fetchAdmin();
   }, [navigate]);
 
-  const handleDelete = async () => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete your profile?"
-    );
-    if (!confirm) return;
+const handleDelete = async () => {
+  const confirm = window.confirm(
+    "Are you sure you want to delete your profile?"
+  );
+  if (!confirm) return;
 
-    try {
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`${baseURL}/api/admins/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      localStorage.removeItem("adminToken");
-      navigate("/admin-login");
-    } catch (err) {
-      alert("Failed to delete profile.");
-    }
-  };
+  try {
+    const token = await getFreshToken();
+    await axios.delete(`${baseURL}/api/admins/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    await auth.signOut(); // ✅ sign out from Firebase
+    localStorage.removeItem("adminToken");
+    window.location.href = "/admin-login"; // ✅ hard reload
+  } catch (err) {
+    alert("Failed to delete profile.");
+  }
+};
 
   if (error)
     return (
