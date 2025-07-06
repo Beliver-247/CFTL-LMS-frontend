@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebase"; // Adjust the import path as necessary
 import {
   FaUser,
   FaEnvelope,
@@ -87,10 +88,12 @@ export default function AdminDashboard() {
             <span>Admin Dashboard</span>
           </h1>
           <button
-            onClick={() => {
-              localStorage.removeItem("adminToken");
-              navigate("/admin-login");
-            }}
+onClick={async () => {
+  await auth.signOut();
+  localStorage.removeItem("adminToken");
+  window.location.href = "/admin-login";
+}}
+
             className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors"
           >
             <FaSignOutAlt />
