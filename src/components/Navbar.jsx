@@ -29,32 +29,41 @@ export default function Navbar() {
   ];
 
   // Role-specific navigation items
-  const roleItems = {
-    guest: [
-      { path: '/', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
-      { path: '/teacher-register', name: 'Teacher Register' },
-      { path: '/parent-login', name: 'Parent Login' },
-      { path: '/student-register', name: 'Student Register', icon: <FaGraduationCap className="mr-1" /> }
-    ],
-    teacher: [
-      { path: '/teacher-dashboard', name: 'Dashboard', icon: <FaChalkboardTeacher className="mr-1" /> },
-      { path: '/teacher-courses', name: 'Courses' },
-      { path: '/teacher-students', name: 'Students' },
-      { path: '/teacher-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
-    ],
-    parent: [
-      { path: '/parent-dashboard', name: 'Dashboard' },
-      { path: '/parent-children', name: 'My Children' },
-      { path: '/parent-payments', name: 'Payments' },
-      { path: '/parent-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
-    ],
-    student: [
-      { path: '/student-dashboard', name: 'Dashboard', icon: <FaGraduationCap className="mr-1" /> },
-      { path: '/student-courses', name: 'My Courses' },
-      { path: '/student-grades', name: 'Grades' },
-      { path: '/student-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
-    ]
-  };
+// Role-specific navigation items
+const roleItems = {
+  guest: [
+    { path: '/', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
+    { path: '/teacher-register', name: 'Teacher Register' },
+    { path: '/parent-login', name: 'Parent Login' },
+    { path: '/student-register', name: 'Student Register', icon: <FaGraduationCap className="mr-1" /> }
+  ],
+  teacher: [
+    { path: '/teacher-dashboard', name: 'Dashboard', icon: <FaChalkboardTeacher className="mr-1" /> },
+    { path: '/teacher-courses', name: 'Courses' },
+    { path: '/teacher-students', name: 'Students' },
+    { path: '/teacher-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
+  ],
+  parent: [
+    { path: '/parent-dashboard', name: 'Dashboard' },
+    { path: '/parent-children', name: 'My Children' },
+    { path: '/parent-payments', name: 'Payments' },
+    { path: '/parent-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
+  ],
+  student: [
+    { path: '/student-dashboard', name: 'Dashboard', icon: <FaGraduationCap className="mr-1" /> },
+    { path: '/student-courses', name: 'My Courses' },
+    { path: '/student-grades', name: 'Grades' },
+    { path: '/student-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
+  ],
+  admin: [
+    { path: '/admin-dashboard', name: 'Dashboard', icon: <FaUser className="mr-1" /> },
+    { path: '/admin/manage-courses', name: 'Manage Courses' },
+    { path: '/admin/manage-subjects', name: 'Manage Subjects' },
+    { path: '/admin/subjects/create', name: 'Create Subject' },
+    { path: '/admin/courses/create', name: 'Create Course' },
+    { path: '/admin/set-role', name: 'Set Roles' }
+  ]
+};
 
   const navItems = [...commonItems, ...(roleItems[userType] || [])];
 

@@ -160,7 +160,7 @@ export default function Home() {
               <ul className="space-y-2">
                 <li><a href="/" className="text-gray-400 hover:text-white">Home</a></li>
                 <li><a href="/student-register" className="text-gray-400 hover:text-white">Admissions</a></li>
-                <li><a href="/admin-login" className="text-gray-400 hover:text-white">Admins</a></li>
+                <li><a href="/coordinator-login" className="text-gray-400 hover:text-white">Course Coordinators</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
               </ul>
             </div>
