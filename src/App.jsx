@@ -27,6 +27,7 @@ import CourseEnrolledStudents from "./pages/CoordinatorPages/CourseEnrolledStude
 import EnrollStudentsToCourse from "./pages/CoordinatorPages/EnrollStudentsToCourse";
 import EditStudent from "./pages/StudentPages/EditStudent";
 import ManageStudents from "./pages/StudentPages/ManageStudents";
+import EnrolledStudents from "./pages/CoordinatorPages/EnrolledStudents";
 
 export default function App() {
   return (
@@ -55,8 +56,22 @@ export default function App() {
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/student-register" element={<StudentRegister />} />
-          <Route path="/admin/manage-students" element={<ManageStudents />} />
-          <Route path="/admin/students/:id/edit" element={<EditStudent />} />
+          <Route
+            path="/admin/manage-students"
+            element={
+              <ProtectedRoute
+                element={ManageStudents}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
+          <Route
+            path="/admin/students/:id/edit"
+            element={
+              <ProtectedRoute element={EditStudent} allowedRoles={["admin"]} />
+            }
+          />
+
           <Route
             path="/coordinator-login"
             element={
@@ -149,6 +164,15 @@ export default function App() {
             element={
               <ProtectedRoute
                 element={EnrollStudentsToCourse}
+                allowedRoles={["coordinator"]}
+              />
+            }
+          />
+          <Route
+            path="/coordinator/enrolled-students"
+            element={
+              <ProtectedRoute
+                element={EnrolledStudents}
                 allowedRoles={["coordinator"]}
               />
             }
