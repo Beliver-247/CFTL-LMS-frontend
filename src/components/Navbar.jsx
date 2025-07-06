@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { auth } from '../firebase'; // adjust path if needed
+
 import {
   FaGraduationCap,
   FaUser,
@@ -28,7 +30,6 @@ export default function Navbar() {
     { path: '/', name: 'Home', icon: <FaHome className="mr-1" /> }
   ];
 
-  // Role-specific navigation items
 // Role-specific navigation items
 const roleItems = {
   guest: [
@@ -67,11 +68,29 @@ const roleItems = {
 
   const navItems = [...commonItems, ...(roleItems[userType] || [])];
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
+const handleLogout = async () => {
+  try {
+    await auth.signOut();
+  } catch (err) {
+    console.error('Firebase sign out failed:', err);
+  }
+
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('userRole');
+
+  if (userType === 'admin') {
+    navigate('/admin-login');
+  } else if (userType === 'coordinator') {
+    navigate('/coordinator-login');
+  } else if (userType === 'teacher') {
+    navigate('/teacher-login');
+  } else if (userType === 'parent') {
+    navigate('/parent-login');
+  } else {
     navigate('/');
-  };
+  }
+};
+
 
   return (
     <nav className="bg-blue-900 text-white shadow-lg">
