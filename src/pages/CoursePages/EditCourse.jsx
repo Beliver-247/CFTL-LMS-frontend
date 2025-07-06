@@ -97,27 +97,35 @@ export default function EditCourse() {
     }
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleUpdate = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    try {
-      const payload = {
-        ...form,
-        totalFee: parseFloat(form.totalFee),
-        program: form.program.toUpperCase(),
-        stream: form.program === 'AL' ? form.stream.toLowerCase() : null
-      };
+  try {
+    const payload = {
+      name: form.name,
+      program: form.program.toUpperCase(),
+      year: form.year,
+      duration: form.duration,
+      coordinatorEmail: form.coordinatorEmail,
+      totalFee: parseFloat(form.totalFee),
+      subjects: form.subjects
+    };
 
-      await axios.put(`${baseURL}/api/courses/${courseId}`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      navigate('/admin/manage-courses');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update course');
+    if (form.program === 'AL') {
+      payload.stream = form.stream.toLowerCase();
     }
-  };
+
+    await axios.put(`${baseURL}/api/courses/${courseId}`, payload, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    navigate('/admin/manage-courses');
+  } catch (err) {
+    setError(err.response?.data?.error || 'Failed to update course');
+  }
+};
+
 
   const showStream = form.program === 'AL';
 

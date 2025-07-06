@@ -81,37 +81,41 @@ export default function AdminLogin() {
     }
   };
 
-  const checkProfileAndNavigate = async (token) => {
-    try {
-      const res = await axios.get(`${baseURL}/api/admins/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+const checkProfileAndNavigate = async (token) => {
+  try {
+    const res = await axios.get(`${baseURL}/api/admins/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      const { fullName, nameInitials, telephone } = res.data;
+    const { fullName, nameInitials, telephone, role } = res.data;
 
-      if (!fullName?.trim() || !nameInitials?.trim() || !telephone?.trim()) {
-        navigate("/admin-complete-profile");
-      } else {
-        navigate("/admin-dashboard");
-      }
-    } catch (err) {
-      const status = err.response?.status;
-      const message = err.response?.data?.error;
+    // ✅ Store role in localStorage for Navbar
+    localStorage.setItem("userRole", role);
 
-      if (status === 403 && message?.includes("Unauthorized")) {
-        setError("You are not authorized to access the admin portal.");
-        auth.signOut();
-        localStorage.removeItem("adminToken");
-        return;
-      }
-
-      if (status === 404) {
-        navigate("/admin-complete-profile");
-      } else {
-        setError("An unexpected error occurred.");
-      }
+    if (!fullName?.trim() || !nameInitials?.trim() || !telephone?.trim()) {
+      navigate("/admin-complete-profile");
+    } else {
+      navigate("/admin-dashboard");
     }
-  };
+  } catch (err) {
+    const status = err.response?.status;
+    const message = err.response?.data?.error;
+
+    if (status === 403 && message?.includes("Unauthorized")) {
+      setError("You are not authorized to access the admin portal.");
+      auth.signOut();
+      localStorage.removeItem("adminToken");
+      return;
+    }
+
+    if (status === 404) {
+      navigate("/admin-complete-profile");
+    } else {
+      setError("An unexpected error occurred.");
+    }
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
