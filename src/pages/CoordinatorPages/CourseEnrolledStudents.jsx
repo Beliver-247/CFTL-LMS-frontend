@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { FaUserPlus, FaUsers } from 'react-icons/fa';
+import { FaUserPlus, FaUsers, FaTrash } from 'react-icons/fa';
 
 export default function CourseEnrolledStudents() {
   const { courseId } = useParams();
@@ -15,8 +14,8 @@ export default function CourseEnrolledStudents() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [modalSearch, setModalSearch] = useState('');
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const fetchCourseAndEnrollments = async () => {
@@ -46,29 +45,52 @@ export default function CourseEnrolledStudents() {
   }, [courseId]);
 
   const alreadyEnrolledIds = enrollments.map(e => e.studentId);
+
   const availableStudents = students.filter(
-    student => !alreadyEnrolledIds.includes(student.id) &&
-      (student.name?.toLowerCase().includes(search.toLowerCase()) || student.nic?.includes(search))
+    student =>
+      !alreadyEnrolledIds.includes(student.id) &&
+      (student.nameFull?.toLowerCase().includes(modalSearch.toLowerCase()) ||
+        student.nic?.includes(modalSearch))
+  );
+
+  const filteredEnrollments = enrollments.filter(
+    e =>
+      e.student?.nameFull?.toLowerCase().includes(search.toLowerCase()) ||
+      e.student?.nic?.includes(search)
   );
 
   const handleEnroll = async (studentId) => {
     try {
       await axios.post(`${baseURL}/api/enrollments`, {
         studentId,
-        courseId
+        courseId,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Refresh enrollment list
       const updated = await axios.get(`${baseURL}/api/enrollments/course/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setEnrollments(updated.data);
       setShowModal(false);
+      setModalSearch('');
     } catch (err) {
       alert("Enrollment failed.");
+    }
+  };
+
+  const handleUnenroll = async (enrollmentId) => {
+    if (!window.confirm("Are you sure you want to remove this student from the course?")) return;
+
+    try {
+      await axios.delete(`${baseURL}/api/enrollments/${enrollmentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setEnrollments(prev => prev.filter(e => e.id !== enrollmentId));
+    } catch (err) {
+      alert("Failed to remove student.");
     }
   };
 
@@ -82,31 +104,56 @@ export default function CourseEnrolledStudents() {
         </h1>
         <button
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-          onClick={() => navigate(`/coordinator/courses/${courseId}/enroll`)}
+          onClick={() => setShowModal(true)}
         >
           <FaUserPlus />
           Enroll Student
         </button>
       </div>
 
-      {enrollments.length === 0 ? (
+      <input
+        type="text"
+        placeholder="Search enrolled students..."
+        className="mb-4 px-3 py-2 border rounded w-full max-w-md"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      {filteredEnrollments.length === 0 ? (
         <p>No students enrolled yet.</p>
       ) : (
-        <div className="bg-white shadow rounded-lg p-4">
-          <table className="w-full table-auto">
+        <div className="bg-white shadow rounded-lg p-4 overflow-x-auto">
+          <table className="w-full table-auto text-sm">
             <thead>
               <tr className="text-left bg-gray-100">
                 <th className="p-2">Name</th>
                 <th className="p-2">NIC</th>
                 <th className="p-2">DOB</th>
+                <th className="p-2">Action</th>
               </tr>
             </thead>
             <tbody>
-              {enrollments.map(({ id, student }) => (
+              {filteredEnrollments.map(({ id, student }) => (
                 <tr key={id} className="border-b hover:bg-gray-50">
-                  <td className="p-2">{student?.name || 'N/A'}</td>
+                  <td className="p-2">{student?.nameFull || 'N/A'}</td>
                   <td className="p-2">{student?.nic}</td>
-                  <td className="p-2">{new Date(student?.dob).toLocaleDateString()}</td>
+                  <td className="p-2">
+  {student?.dob
+    ? (student.dob.toDate
+        ? student.dob.toDate().toLocaleDateString()
+        : new Date(student.dob).toLocaleDateString())
+    : 'N/A'}
+</td>
+
+
+                  <td className="p-2">
+                    <button
+                      onClick={() => handleUnenroll(id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -120,7 +167,8 @@ export default function CourseEnrolledStudents() {
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative">
             <button
               className="absolute top-2 right-3 text-xl text-gray-500 hover:text-black"
-              onClick={() => setShowModal(false)}
+              onClick={() => navigate(`/coordinator/courses/${courseId}/enroll`)}
+
             >
               &times;
             </button>
@@ -131,17 +179,17 @@ export default function CourseEnrolledStudents() {
               type="text"
               placeholder="Search by name or NIC..."
               className="w-full border px-3 py-2 mb-4 rounded"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={modalSearch}
+              onChange={(e) => setModalSearch(e.target.value)}
             />
 
             {availableStudents.length === 0 ? (
               <p>No students found.</p>
             ) : (
               <div className="max-h-80 overflow-y-auto">
-                <table className="w-full">
+                <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-sm bg-gray-100">
+                    <tr className="text-left bg-gray-100">
                       <th className="p-2">Name</th>
                       <th className="p-2">NIC</th>
                       <th className="p-2">Action</th>
@@ -149,8 +197,8 @@ export default function CourseEnrolledStudents() {
                   </thead>
                   <tbody>
                     {availableStudents.map(student => (
-                      <tr key={student.id} className="border-b hover:bg-gray-50 text-sm">
-                        <td className="p-2">{student.name}</td>
+                      <tr key={student.id} className="border-b hover:bg-gray-50">
+                        <td className="p-2">{student.nameFull}</td>
                         <td className="p-2">{student.nic}</td>
                         <td className="p-2">
                           <button
