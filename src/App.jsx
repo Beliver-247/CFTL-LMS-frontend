@@ -25,6 +25,8 @@ import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated";
 import CoordinatorLogin from "./pages/CoordinatorPages/CoordinatorLogin";
 import CourseEnrolledStudents from "./pages/CoordinatorPages/CourseEnrolledStudents";
 import EnrollStudentsToCourse from "./pages/CoordinatorPages/EnrollStudentsToCourse";
+import EditStudent from "./pages/StudentPages/EditStudent";
+import ManageStudents from "./pages/StudentPages/ManageStudents";
 
 export default function App() {
   return (
@@ -53,6 +55,8 @@ export default function App() {
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/student-register" element={<StudentRegister />} />
+          <Route path="/admin/manage-students" element={<ManageStudents />} />
+          <Route path="/admin/students/:id/edit" element={<EditStudent />} />
           <Route
             path="/coordinator-login"
             element={
