@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { auth } from "../../firebase";
 import {
   signInWithEmailAndPassword,
@@ -18,6 +19,29 @@ export default function CoordinatorLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+  const checkIfLoggedIn = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const token = await user.getIdToken();
+      const res = await axios.get(`${baseURL}/api/admins/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { role } = res.data || {};
+      if (role === "coordinator") {
+        navigate("/coordinator-dashboard");
+      }
+    } catch (err) {
+      // Do nothing, allow login screen
+    }
+  };
+
+  checkIfLoggedIn();
+}, []);
 
   const checkInvite = async (email) => {
     try {
@@ -164,6 +188,15 @@ export default function CoordinatorLogin() {
               {googleLoading ? "Signing in..." : <><FcGoogle className="mr-2" /> Google</>}
             </button>
           </div>
+          <div className="mt-6 text-center text-sm text-gray-600">
+  Not a coordinator?{" "}
+  <a
+    href="/admin-login"
+    className="text-indigo-600 hover:underline font-medium"
+  >
+    Go to Admin Login
+  </a>
+</div>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { auth } from "../../firebase";
+import { useEffect } from "react";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -18,6 +19,33 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+  const checkIfAlreadyLoggedIn = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const token = await user.getIdToken();
+      const res = await axios.get(`${baseURL}/api/admins/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { fullName, nameInitials, telephone, role } = res.data;
+
+      if (!fullName?.trim() || !nameInitials?.trim() || !telephone?.trim()) {
+        navigate("/admin-complete-profile");
+      } else {
+        navigate("/admin-dashboard");
+      }
+    } catch (err) {
+      // If error occurs, just stay on login page
+      console.error("Auto-login check failed:", err);
+    }
+  };
+
+  checkIfAlreadyLoggedIn();
+}, []);
 
   // 🔍 Checks if user is invited before allowing profile access
   const checkInvite = async (email) => {

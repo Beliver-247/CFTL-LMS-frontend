@@ -1,37 +1,47 @@
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function ProtectedRoute({ element: Component, allowedRoles }) {
-  const roleMap = {
-    adminToken: 'admin', // fallback if decoding fails
-    teacherToken: 'teacher',
-    token: 'parent'
-  };
+  const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [redirectPath, setRedirectPath] = useState('/');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  const tokenKey = Object.keys(roleMap).find((key) => localStorage.getItem(key));
-  const token = localStorage.getItem(tokenKey);
+  useEffect(() => {
+    const checkAccess = async () => {
+      const token = localStorage.getItem("adminToken");
 
-  if (!token) {
-    if (allowedRoles.includes('parent')) return <Navigate to="/parent-login" replace />;
-    if (allowedRoles.includes('teacher')) return <Navigate to="/teacher-login" replace />;
-    return <Navigate to="/admin-login" replace />;
-  }
+      if (!token) {
+        // Route to correct login page
+        if (allowedRoles.includes('parent')) return setRedirectPath('/parent-login');
+        if (allowedRoles.includes('teacher')) return setRedirectPath('/teacher-login');
+        return setRedirectPath('/admin-login');
+      }
 
-  let role;
+      try {
+        const res = await axios.get(`${baseURL}/api/admins/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  try {
-    if (tokenKey === 'adminToken') {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      role = payload?.role || 'admin';
-    } else {
-      role = roleMap[tokenKey];
-    }
+        const role = res.data?.role || 'admin';
+        if (allowedRoles.includes(role)) {
+          setIsAuthorized(true);
+        }
+      } catch (err) {
+        console.error('ProtectedRoute check failed:', err);
+        setRedirectPath('/admin-login');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (!allowedRoles.includes(role)) {
-      return <Navigate to="/" replace />;
-    }
+    checkAccess();
+  }, [allowedRoles]);
 
-    return <Component />;
-  } catch (err) {
-    return <Navigate to="/" replace />;
-  }
+  if (loading) return null;
+
+  if (isAuthorized) return <Component />;
+
+  return <Navigate to={redirectPath} replace />;
 }
