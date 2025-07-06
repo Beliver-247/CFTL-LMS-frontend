@@ -23,6 +23,8 @@ import ManageSubjects from "./pages/CoursePages/ManageSubjects";
 import AdminSetRole from "./pages/AdminPages/AdminSetRole";
 import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated";
 import CoordinatorLogin from "./pages/CoordinatorPages/CoordinatorLogin";
+import CourseEnrolledStudents from "./pages/CoordinatorPages/CourseEnrolledStudents";
+import EnrollStudentsToCourse from "./pages/CoordinatorPages/EnrollStudentsToCourse";
 
 export default function App() {
   return (
@@ -126,6 +128,24 @@ export default function App() {
               <ProtectedRoute
                 element={ManageSubjects}
                 allowedRoles={["admin"]}
+              />
+            }
+          />
+          <Route
+            path="/coordinator/courses/:courseId/students"
+            element={
+              <ProtectedRoute
+                element={CourseEnrolledStudents}
+                allowedRoles={["coordinator"]}
+              />
+            }
+          />
+          <Route
+            path="/coordinator/courses/:courseId/enroll"
+            element={
+              <ProtectedRoute
+                element={EnrollStudentsToCourse}
+                allowedRoles={["coordinator"]}
               />
             }
           />

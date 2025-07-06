@@ -32,6 +32,10 @@ export default function CoordinatorDashboard() {
     window.location.href = "/coordinator-login";
   };
 
+  const handleCourseClick = (courseId) => {
+    navigate(`/coordinator/courses/${courseId}/students`);
+  };
+
   if (error) return <div className="text-red-600 p-4">{error}</div>;
 
   return (
@@ -65,7 +69,11 @@ export default function CoordinatorDashboard() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {courses.map(course => (
-              <div key={course.id} className="p-5 bg-white shadow rounded-lg">
+              <div
+                key={course.id}
+                className="p-5 bg-white shadow rounded-lg cursor-pointer hover:bg-indigo-50 transition"
+                onClick={() => handleCourseClick(course.id)}
+              >
                 <h3 className="text-lg font-semibold mb-1">{course.name}</h3>
                 <p className="text-sm text-gray-600 mb-1">
                   Program: {course.program} {course.stream ? `- ${course.stream}` : ''}
