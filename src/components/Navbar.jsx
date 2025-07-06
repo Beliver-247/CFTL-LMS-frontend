@@ -31,7 +31,7 @@ export default function Navbar() {
   // Role-specific navigation items
   const roleItems = {
     guest: [
-      { path: '/teacher-login', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
+      { path: '/', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
       { path: '/teacher-register', name: 'Teacher Register' },
       { path: '/parent-login', name: 'Parent Login' },
       { path: '/student-register', name: 'Student Register', icon: <FaGraduationCap className="mr-1" /> }
@@ -111,7 +111,7 @@ export default function Navbar() {
               ) : (
                 <div className="flex space-x-2">
                   <Link
-                    to="/teacher-login"
+                    to="/"
                     className="px-4 py-2 bg-blue-700 rounded-md text-sm font-medium hover:bg-blue-600"
                   >
                     Teacher Login
