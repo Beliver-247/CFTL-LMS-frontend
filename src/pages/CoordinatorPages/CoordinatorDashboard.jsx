@@ -14,10 +14,12 @@ export default function CoordinatorDashboard() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [courses, setCourses] = useState([]);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
+      setIsLoading(true);
       const token = localStorage.getItem("adminToken");
       try {
         const res = await axios.get(
@@ -27,13 +29,16 @@ export default function CoordinatorDashboard() {
           }
         );
         setCourses(res.data);
+        setError("");
       } catch (err) {
         setError("Failed to fetch courses");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchCourses();
-  }, []);
+  }, [baseURL]);
 
   const handleLogout = async () => {
     await auth.signOut();
@@ -44,6 +49,15 @@ export default function CoordinatorDashboard() {
   const handleCourseClick = (courseId) => {
     navigate(`/coordinator/courses/${courseId}/students`);
   };
+
+  // Show spinner while loading
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin h-12 w-12 border-t-4 border-b-4 border-indigo-600 rounded-full" />
+      </div>
+    );
+  }
 
   if (error) return <div className="text-red-600 p-4">{error}</div>;
 
@@ -102,8 +116,7 @@ export default function CoordinatorDashboard() {
                   <FaClock className="mr-1" /> Duration: {course.duration}
                 </p>
                 <p className="text-sm text-gray-600 flex items-center">
-                  <FaUserGraduate className="mr-1" /> Total Fee: Rs.{" "}
-                  {course.totalFee}
+                  <FaUserGraduate className="mr-1" /> Total Fee: Rs. {course.totalFee}
                 </p>
               </div>
             ))}

@@ -3,24 +3,30 @@ import axios from 'axios';
 import { FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
+
+
 export default function ManageCourses() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState('');
   const [filterGrade, setFilterGrade] = useState('');
   const [filterDuration, setFilterDuration] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem('adminToken');
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setIsLoading(true);
         const res = await axios.get(`${baseURL}/api/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourses(res.data);
       } catch (err) {
         console.error('Failed to fetch courses', err);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCourses();
@@ -94,53 +100,60 @@ export default function ManageCourses() {
         </select>
       </div>
 
-      {/* Course Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCourses.map((course) => (
-          <div key={course.id} className="bg-white p-6 rounded-xl shadow-md relative">
-            <h3 className="text-lg font-semibold">{course.name}</h3>
-            <p className="text-sm text-gray-600">
-              {course.program} — Grade {course.grade}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Duration: {course.duration} | Year: {course.year}
-            </p>
-            {course.stream && (
-              <p className="text-sm text-gray-500">Stream: {course.stream}</p>
-            )}
-            <p className="text-sm text-gray-500 mt-1">Coordinator: {course.coordinatorEmail}</p>
-            <p className="text-sm text-gray-700 mt-2 font-medium">Total Fee: Rs. {course.totalFee}</p>
+      {/* Loading Animation */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-screen">
+          <div className="animate-spin h-10 w-10 border-t-2 border-b-2 border-blue-600 rounded-full" />
+        </div>
+      ) : (
+        /* Course Grid */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCourses.map((course) => (
+            <div key={course.id} className="bg-white p-6 rounded-xl shadow-md relative">
+              <h3 className="text-lg font-semibold">{course.name}</h3>
+              <p className="text-sm text-gray-600">
+                {course.program} — Grade {course.grade}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Duration: {course.duration} | Year: {course.year}
+              </p>
+              {course.stream && (
+                <p className="text-sm text-gray-500">Stream: {course.stream}</p>
+              )}
+              <p className="text-sm text-gray-500 mt-1">Coordinator: {course.coordinatorEmail}</p>
+              <p className="text-sm text-gray-700 mt-2 font-medium">Total Fee: Rs. {course.totalFee}</p>
 
-            {/* Subjects */}
-            {course.subjectDetails?.length > 0 && (
-              <div className="mt-3">
-                <p className="text-sm font-medium text-gray-700 mb-1">Subjects:</p>
-                <ul className="list-disc list-inside text-sm text-gray-600">
-                  {course.subjectDetails.map((subj) => (
-                    <li key={subj.id}>{subj.subjectName}</li>
-                  ))}
-                </ul>
+              {/* Subjects */}
+              {course.subjectDetails?.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Subjects:</p>
+                  <ul className="list-disc list-inside text-sm text-gray-600">
+                    {course.subjectDetails.map((subj) => (
+                      <li key={subj.id}>{subj.subjectName}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex mt-4 space-x-3">
+                <button
+                  onClick={() => navigate(`/admin/courses/edit/${course.id}`)}
+                  className="flex items-center text-sm text-yellow-600 hover:text-yellow-800"
+                >
+                  <FaEdit className="mr-1" /> Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(course.id)}
+                  className="flex items-center text-sm text-red-600 hover:text-red-800"
+                >
+                  <FaTrash className="mr-1" /> Delete
+                </button>
               </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex mt-4 space-x-3">
-              <button
-                onClick={() => navigate(`/admin/courses/edit/${course.id}`)}
-                className="flex items-center text-sm text-yellow-600 hover:text-yellow-800"
-              >
-                <FaEdit className="mr-1" /> Edit
-              </button>
-              <button
-                onClick={() => handleDelete(course.id)}
-                className="flex items-center text-sm text-red-600 hover:text-red-800"
-              >
-                <FaTrash className="mr-1" /> Delete
-              </button>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

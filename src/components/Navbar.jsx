@@ -25,10 +25,6 @@ export default function Navbar() {
     setUserType(role);
   }, [location]);
 
-  const commonItems = [
-    { path: '/', name: 'Home', icon: <FaHome className="mr-1" /> }
-  ];
-
   const roleItems = {
     guest: [
       { path: '/', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
@@ -57,11 +53,9 @@ export default function Navbar() {
     admin: [
       { path: '/admin-dashboard', name: 'Dashboard', icon: <FaUser className="mr-1" /> },
       { path: '/admin/manage-courses', name: 'Manage Courses' },
-      { path: '/admin/manage-subjects', name: 'Manage Subjects' },
       { path: '/admin/subjects/create', name: 'Create Subject' },
       { path: '/admin/courses/create', name: 'Create Course' },
-      { path: '/admin/set-role', name: 'Set Roles' },
-      { path: '/admin/manage-students', name: 'Manage Students' }
+      { path: '/admin/set-role', name: 'Set Roles' }
     ],
     coordinator: [
       { path: '/coordinator-dashboard', name: 'Dashboard', icon: <FaUser className="mr-1" /> },
@@ -78,7 +72,8 @@ export default function Navbar() {
     currentNavItems = roleItems['coordinator'];
   }
 
-  const navItems = [...commonItems, ...currentNavItems];
+const navItems = currentNavItems;
+
 
   const handleLogout = async () => {
     try {
@@ -109,10 +104,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <FaGraduationCap className="h-8 w-8 text-blue-300" />
-              <span className="ml-2 text-xl font-bold">CFTL LMS</span>
-            </div>
+<Link to="/" className="flex-shrink-0 flex items-center hover:opacity-80">
+  <FaGraduationCap className="h-8 w-8 text-blue-300" />
+  <span className="ml-2 text-xl font-bold">CFTL LMS</span>
+</Link>
+
 
             {/* Desktop Nav */}
             <div className="hidden md:block ml-10">
