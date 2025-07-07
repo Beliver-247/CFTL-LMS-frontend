@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { 
-  FaChalkboardTeacher, 
-  FaBook, 
-  FaCalendarAlt, 
-  FaFileAlt, 
-  FaMoneyBillWave, 
-  FaClipboardList, 
+import axios from "axios";
+import {
+  FaChalkboardTeacher,
+  FaBook,
+  FaCalendarAlt,
+  FaFileAlt,
+  FaMoneyBillWave,
+  FaClipboardList,
   FaSignOutAlt,
   FaUser,
-  FaEnvelope, 
+  FaEnvelope,
   FaGraduationCap,
-  FaDollarSign
+  FaDollarSign,
 } from "react-icons/fa";
 
 export default function TeacherDashboard() {
@@ -21,44 +21,52 @@ export default function TeacherDashboard() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-useEffect(() => {
-  const token = localStorage.getItem('token');
-  const role = localStorage.getItem('userRole');
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("userRole");
 
-  if (!token || role !== 'parent') {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    return navigate('/parent-login');
-  }
-
-  const fetchStudents = async () => {
-    try {
-      const res = await axios.get(`${baseURL}/api/parents/children`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setStudents(res.data || []);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Could not fetch child records.');
+    if (!token || role !== "teacher") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
+      return navigate("/teacher-login");
     }
-  };
 
-  fetchStudents();
-}, [navigate]);
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get(`${baseURL}/api/teachers/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setProfile(res.data);
+      } catch (err) {
+        if (err.response?.status === 404) {
+          // No profile exists – redirect to complete it
+          return navigate("/teacher-complete-profile");
+        }
+
+        setError(err.response?.data?.error || "Failed to fetch teacher profile.");
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
 
-  if (error) return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        {error}
+  if (error)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
       </div>
-    </div>
-  );
+    );
 
-  if (!profile) return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  if (!profile)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -70,170 +78,115 @@ useEffect(() => {
               <FaChalkboardTeacher className="text-3xl" />
               <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
             </div>
-            <button
-              onClick={() => {
-                localStorage.removeItem("token");
-                navigate("/teacher-login");
-              }}
-              className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors"
-            >
-              <FaSignOutAlt />
-              <span>Logout</span>
-            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Profile Overview */}
       <main className="container mx-auto px-4 py-8">
-        {/* Profile Section */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <FaUser className="mr-2 text-blue-600" />
-              My Profile
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center">
-                <FaUser className="text-gray-400 mr-3" />
+        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 p-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <FaUser className="mr-2 text-blue-600" />
+            My Profile
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ProfileItem icon={<FaUser />} label="Name" value={profile.name} />
+            <ProfileItem icon={<FaEnvelope />} label="Email" value={profile.email} />
+            <ProfileItem icon={<FaChalkboardTeacher />} label="Type" value={profile.type} />
+            <ProfileItem
+              icon={<FaDollarSign />}
+              label="Salary"
+              value={`LKR ${profile.salary?.toLocaleString()}`}
+            />
+            {profile.qualifications?.length > 0 && (
+              <div className="md:col-span-2 flex items-start">
+                <FaGraduationCap className="text-gray-400 mr-3 mt-1" />
                 <div>
-                  <p className="text-sm text-gray-500">Name</p>
-                  <p className="font-medium">{profile.name}</p>
+                  <p className="text-sm text-gray-500">Qualifications</p>
+                  <p className="font-medium">
+                    {profile.qualifications.join(", ")}
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center">
-                <FaEnvelope className="text-gray-400 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{profile.email}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <FaChalkboardTeacher className="text-gray-400 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Type</p>
-                  <p className="font-medium capitalize">{profile.type}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <FaDollarSign className="text-gray-400 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Salary</p>
-                  <p className="font-medium">LKR {profile.salary?.toLocaleString()}</p>
-                </div>
-              </div>
-              {profile.qualifications?.length > 0 && (
-                <div className="flex items-start md:col-span-2">
-                  <FaGraduationCap className="text-gray-400 mr-3 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-500">Qualifications</p>
-                    <p className="font-medium">{profile.qualifications.join(", ")}</p>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
         {/* Dashboard Actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* My Modules */}
-          <div 
-            onClick={() => navigate('/teacher-modules')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-blue-100 p-3 rounded-full mr-4">
-                <FaBook className="text-blue-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">My Modules</h3>
-                <p className="text-gray-500 text-sm">View and manage your teaching modules</p>
-              </div>
-            </div>
-          </div>
-
-          {/* View Syllabus */}
-          <div 
-            onClick={() => navigate('/syllabus')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-green-100 p-3 rounded-full mr-4">
-                <FaFileAlt className="text-green-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">View Syllabus</h3>
-                <p className="text-gray-500 text-sm">Access course syllabi and materials</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Examination Timetables */}
-          <div 
-            onClick={() => navigate('/exam-timetables')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-purple-100 p-3 rounded-full mr-4">
-                <FaCalendarAlt className="text-purple-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Exam Timetables</h3>
-                <p className="text-gray-500 text-sm">View examination schedules</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Academic Timetables */}
-          <div 
-            onClick={() => navigate('/academic-timetables')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-yellow-100 p-3 rounded-full mr-4">
-                <FaCalendarAlt className="text-yellow-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Academic Timetables</h3>
-                <p className="text-gray-500 text-sm">View class schedules</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Status */}
-          <div 
-            onClick={() => navigate('/payment-status')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-red-100 p-3 rounded-full mr-4">
-                <FaMoneyBillWave className="text-red-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Payment Status</h3>
-                <p className="text-gray-500 text-sm">Check your payment history</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Update Payment Details */}
-          <div 
-            onClick={() => navigate('/update-payment-details')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-indigo-100 p-3 rounded-full mr-4">
-                <FaClipboardList className="text-indigo-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Update Payment Details</h3>
-                <p className="text-gray-500 text-sm">Manage your bank information</p>
-              </div>
-            </div>
-          </div>
+          <ActionCard
+            icon={<FaBook className="text-blue-600 text-xl" />}
+            title="My Modules"
+            subtitle="View and manage your modules"
+            onClick={() => navigate("/teacher-modules")}
+            bg="bg-blue-100"
+          />
+          <ActionCard
+            icon={<FaFileAlt className="text-green-600 text-xl" />}
+            title="View Syllabus"
+            subtitle="Access course syllabi"
+            onClick={() => navigate("/syllabus")}
+            bg="bg-green-100"
+          />
+          <ActionCard
+            icon={<FaCalendarAlt className="text-purple-600 text-xl" />}
+            title="Exam Timetables"
+            subtitle="View exam schedules"
+            onClick={() => navigate("/exam-timetables")}
+            bg="bg-purple-100"
+          />
+          <ActionCard
+            icon={<FaCalendarAlt className="text-yellow-600 text-xl" />}
+            title="Academic Timetables"
+            subtitle="View class schedules"
+            onClick={() => navigate("/academic-timetables")}
+            bg="bg-yellow-100"
+          />
+          <ActionCard
+            icon={<FaMoneyBillWave className="text-red-600 text-xl" />}
+            title="Payment Status"
+            subtitle="Check your payment history"
+            onClick={() => navigate("/payment-status")}
+            bg="bg-red-100"
+          />
+          <ActionCard
+            icon={<FaClipboardList className="text-indigo-600 text-xl" />}
+            title="Update Payment Info"
+            subtitle="Manage your bank details"
+            onClick={() => navigate("/update-payment-details")}
+            bg="bg-indigo-100"
+          />
         </div>
       </main>
+    </div>
+  );
+}
+
+function ProfileItem({ icon, label, value }) {
+  return (
+    <div className="flex items-center">
+      <div className="text-gray-400 mr-3">{icon}</div>
+      <div>
+        <p className="text-sm text-gray-500">{label}</p>
+        <p className="font-medium">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function ActionCard({ icon, title, subtitle, onClick, bg }) {
+  return (
+    <div
+      onClick={onClick}
+      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+    >
+      <div className="p-6 flex items-center">
+        <div className={`${bg} p-3 rounded-full mr-4`}>{icon}</div>
+        <div>
+          <h3 className="font-semibold text-lg">{title}</h3>
+          <p className="text-gray-500 text-sm">{subtitle}</p>
+        </div>
+      </div>
     </div>
   );
 }
