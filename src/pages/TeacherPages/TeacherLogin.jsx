@@ -35,22 +35,40 @@ export default function TeacherLogin() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setError('');
-    setGoogleLoading(true);
-    
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const token = await result.user.getIdToken();
-      localStorage.setItem('token', token);
+const handleGoogleLogin = async () => {
+  setError('');
+  setGoogleLoading(true);
+
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const token = await result.user.getIdToken();
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('userRole', 'teacher');
+
+    // ✅ Check if teacher profile exists
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teachers/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.status === 404) {
+      navigate('/teacher-complete-profile');
+    } else if (res.ok) {
       navigate('/teacher-dashboard');
-    } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
-    } finally {
-      setGoogleLoading(false);
+    } else {
+      const data = await res.json();
+      setError(data?.error || 'Unexpected error occurred');
     }
-  };
+  } catch (err) {
+    setError(err.message.replace('Firebase: ', ''));
+  } finally {
+    setGoogleLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">

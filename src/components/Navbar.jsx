@@ -27,7 +27,7 @@ export default function Navbar() {
 
   const roleItems = {
     guest: [
-      { path: '/', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
+      { path: '/teacher-login', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
       { path: '/teacher-register', name: 'Teacher Register' },
       { path: '/parent-login', name: 'Parent Login' },
       { path: '/student-register', name: 'Student Register', icon: <FaGraduationCap className="mr-1" /> }
@@ -83,6 +83,7 @@ const navItems = currentNavItems;
     }
 
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
     localStorage.removeItem('userRole');
 
     if (userType === 'admin') {
@@ -150,7 +151,7 @@ const navItems = currentNavItems;
               ) : (
                 <div className="flex space-x-2">
                   <Link
-                    to="/"
+                    to="/teacher-login"
                     className="px-4 py-2 bg-blue-700 rounded-md text-sm font-medium hover:bg-blue-600"
                   >
                     Teacher Login
@@ -218,7 +219,7 @@ const navItems = currentNavItems;
             ) : (
               <div className="px-2 space-y-1">
                 <Link
-                  to="/teacher-login"
+                  to="/"
                   className="block px-3 py-2 rounded-md text-base font-medium text-blue-200 hover:text-white hover:bg-blue-700"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

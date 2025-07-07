@@ -38,15 +38,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/parent-login" element={<ParentLogin />} />
           <Route path="/teacher-login" element={<TeacherLogin />} />
-          <Route
-            path="/teacher-dashboard"
-            element={
-              <ProtectedRoute
-                element={TeacherDashboard}
-                allowedRoles={["teacher"]}
-              />
-            }
-          />
+          <Route path="teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/teacher-register" element={<TeacherRegister />} />
           <Route
             path="/teacher-complete-profile"
