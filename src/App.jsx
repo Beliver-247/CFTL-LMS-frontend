@@ -28,6 +28,7 @@ import EnrollStudentsToCourse from "./pages/CoordinatorPages/EnrollStudentsToCou
 import EditStudent from "./pages/StudentPages/EditStudent";
 import ManageStudents from "./pages/StudentPages/ManageStudents";
 import EnrolledStudents from "./pages/CoordinatorPages/EnrolledStudents";
+import StudentDetails from "./pages/StudentPages/StudentDetails";
 
 export default function App() {
   return (
@@ -72,6 +73,8 @@ export default function App() {
               </RedirectIfAuthenticated>
             }
           />
+          <Route path="/admin/students/:id" element={<StudentDetails />} />
+
 
           <Route
             path="/admin-login"
