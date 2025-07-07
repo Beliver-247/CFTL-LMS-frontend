@@ -20,6 +20,7 @@ export default function ManageSubjects() {
   const [stream, setStream] = useState("");
   const [editSubject, setEditSubject] = useState(null);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const streamOptions = ["biology", "maths", "tech", "art", "commerce"];
 
@@ -29,43 +30,41 @@ export default function ManageSubjects() {
   }, []);
 
   const fetchSubjects = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get(`${baseURL}/api/subjects/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSubjects(res.data);
       setFilteredSubjects(res.data);
+      setError("");
     } catch (err) {
       setError("Failed to load subjects");
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Apply filters on search, program, stream
+  // Apply filters
   useEffect(() => {
     let result = [...subjects];
-
     if (search) {
       result = result.filter((sub) =>
         sub.subjectName.toLowerCase().includes(search.toLowerCase())
       );
     }
-
     if (program) {
       result = result.filter((sub) => sub.program === program);
     }
-
     if (program === "AL" && stream) {
       result = result.filter((sub) => sub.stream === stream);
     }
-
     setFilteredSubjects(result);
   }, [search, program, stream, subjects]);
 
   const handleDelete = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this subject?");
-    if (!confirm) return;
-
+    if (!window.confirm("Are you sure you want to delete this subject?")) return;
     try {
       await axios.delete(`${baseURL}/api/subjects/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -79,27 +78,32 @@ export default function ManageSubjects() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editSubject) return;
-
     try {
       const payload = {
         subjectName: editSubject.subjectName.trim(),
         program: editSubject.program,
       };
-
       if (editSubject.program === "AL") {
         payload.stream = editSubject.stream;
       }
-
       await axios.put(`${baseURL}/api/subjects/${editSubject.id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setEditSubject(null);
       fetchSubjects();
     } catch (err) {
       alert("Failed to update subject");
     }
   };
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin h-10 w-10 border-t-2 border-b-2 border-blue-600 rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -112,7 +116,6 @@ export default function ManageSubjects() {
 
       {/* Filters */}
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {/* Search */}
         <div className="flex items-center border rounded-lg px-3 py-2 bg-white shadow-sm">
           <FaSearch className="text-gray-500 mr-2" />
           <input
@@ -124,14 +127,13 @@ export default function ManageSubjects() {
           />
         </div>
 
-        {/* Program */}
         <div className="flex items-center border rounded-lg px-3 py-2 bg-white shadow-sm">
           <FaUniversity className="text-gray-500 mr-2" />
           <select
             value={program}
             onChange={(e) => {
               setProgram(e.target.value);
-              setStream(""); // reset stream
+              setStream("");
             }}
             className="w-full outline-none"
           >
@@ -141,7 +143,6 @@ export default function ManageSubjects() {
           </select>
         </div>
 
-        {/* Stream (only for AL) */}
         {program === "AL" && (
           <div className="flex items-center border rounded-lg px-3 py-2 bg-white shadow-sm">
             <FaStream className="text-gray-500 mr-2" />
@@ -174,8 +175,7 @@ export default function ManageSubjects() {
             </p>
             {subject.program === "AL" && (
               <p className="text-sm text-gray-600">
-                Stream:{" "}
-                <span className="capitalize font-medium">{subject.stream}</span>
+                Stream: <span className="capitalize font-medium">{subject.stream}</span>
               </p>
             )}
             <div className="absolute top-2 right-2 flex gap-2">

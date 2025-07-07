@@ -90,7 +90,7 @@ export default function AdminDashboard() {
             <FaUser className="text-3xl" />
             <span>Admin Dashboard</span>
           </h1>
-          <button
+          {/* <button
             onClick={async () => {
               await auth.signOut();
               localStorage.removeItem("adminToken");
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
           >
             <FaSignOutAlt />
             <span>Logout</span>
-          </button>
+          </button> */}
         </div>
       </header>
 
