@@ -1,19 +1,32 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
-import { FaUserPlus, FaUsers, FaTrash } from 'react-icons/fa';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { FaUserPlus, FaUsers, FaTrash } from "react-icons/fa";
+import StudentPaymentsModal from "../../Modals/StudentPaymentModal";
 
 export default function CourseEnrolledStudents() {
   const { courseId } = useParams();
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem('adminToken');
+  const token = localStorage.getItem("adminToken");
   const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
   const [enrollments, setEnrollments] = useState([]);
-  const [search, setSearch] = useState('');
-  const [error, setError] = useState('');
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openPaymentsModal = (studentId) => {
+    setSelectedStudentId(studentId);
+    setIsModalOpen(true);
+  };
+
+  const closePaymentsModal = () => {
+    setSelectedStudentId(null);
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,12 +41,12 @@ export default function CourseEnrolledStudents() {
           }),
         ]);
 
-        const courseData = coursesRes.data.find(c => c.id === courseId);
+        const courseData = coursesRes.data.find((c) => c.id === courseId);
         setCourse(courseData);
         setEnrollments(enrollmentsRes.data);
-        setError('');
+        setError("");
       } catch (err) {
-        setError('Failed to fetch data');
+        setError("Failed to fetch data");
       } finally {
         setIsLoading(false);
       }
@@ -43,20 +56,25 @@ export default function CourseEnrolledStudents() {
   }, [courseId, baseURL, token]);
 
   const filteredEnrollments = enrollments.filter(
-    e =>
+    (e) =>
       e.student?.nameFull?.toLowerCase().includes(search.toLowerCase()) ||
       e.student?.nic?.includes(search)
   );
 
   const handleUnenroll = async (enrollmentId) => {
-    if (!window.confirm('Are you sure you want to remove this student from the course?')) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to remove this student from the course?"
+      )
+    )
+      return;
     try {
       await axios.delete(`${baseURL}/api/enrollments/${enrollmentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setEnrollments(prev => prev.filter(e => e.id !== enrollmentId));
+      setEnrollments((prev) => prev.filter((e) => e.id !== enrollmentId));
     } catch (err) {
-      alert('Failed to remove student.');
+      alert("Failed to remove student.");
     }
   };
 
@@ -70,66 +88,80 @@ export default function CourseEnrolledStudents() {
 
   if (error) return <div className="text-red-600 p-4">{error}</div>;
 
-  return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <FaUsers /> Students Enrolled in: {course?.name || '...'}
-        </h1>
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-          onClick={() => navigate(`/coordinator/courses/${courseId}/enroll`)}
-        >
-          <FaUserPlus />
-          Enroll Student
-        </button>
-      </div>
-
-      <input
-        type="text"
-        placeholder="Search enrolled students..."
-        className="mb-4 px-3 py-2 border rounded w-full max-w-md"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      {filteredEnrollments.length === 0 ? (
-        <p>No students enrolled yet.</p>
-      ) : (
-        <div className="bg-white shadow rounded-lg p-4 overflow-x-auto">
-          <table className="w-full table-auto text-sm">
-            <thead>
-              <tr className="text-left bg-gray-100">
-                <th className="p-2">Name</th>
-                <th className="p-2">NIC</th>
-                <th className="p-2">DOB</th>
-                <th className="p-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredEnrollments.map(({ id, student }) => (
-                <tr key={id} className="border-b hover:bg-gray-50">
-                  <td className="p-2">{student?.nameFull || 'N/A'}</td>
-                  <td className="p-2">{student?.nic}</td>
-                  <td className="p-2">
-                    {student?.dob
-                      ? new Date(student.dob).toLocaleDateString()
-                      : 'N/A'}
-                  </td>
-                  <td className="p-2">
-                    <button
-                      onClick={() => handleUnenroll(id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+return (
+  <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="flex justify-between items-center mb-6">
+      <h1 className="text-2xl font-bold flex items-center gap-2">
+        <FaUsers /> Students Enrolled in: {course?.name || '...'}
+      </h1>
+      <button
+        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+        onClick={() => navigate(`/coordinator/courses/${courseId}/enroll`)}
+      >
+        <FaUserPlus />
+        Enroll Student
+      </button>
     </div>
-  );
+
+    <input
+      type="text"
+      placeholder="Search enrolled students..."
+      className="mb-4 px-3 py-2 border rounded w-full max-w-md"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+
+    {filteredEnrollments.length === 0 ? (
+      <p>No students enrolled yet.</p>
+    ) : (
+      <div className="bg-white shadow rounded-lg p-4 overflow-x-auto">
+        <table className="w-full table-auto text-sm">
+          <thead>
+            <tr className="text-left bg-gray-100">
+              <th className="p-2">Name</th>
+              <th className="p-2">NIC</th>
+              <th className="p-2">DOB</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEnrollments.map(({ id, student }) => (
+              <tr key={id} className="border-b hover:bg-gray-50">
+                <td className="p-2">{student?.nameFull || 'N/A'}</td>
+                <td className="p-2">{student?.nic}</td>
+                <td className="p-2">
+                  {student?.dob
+                    ? new Date(student.dob).toLocaleDateString()
+                    : 'N/A'}
+                </td>
+                <td className="p-2 flex gap-2">
+                  <button
+                    onClick={() => handleUnenroll(id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                  >
+                    <FaTrash />
+                  </button>
+                  <button
+                    onClick={() => openPaymentsModal(student.id)}
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded"
+                  >
+                    View Payments
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+
+    <StudentPaymentsModal
+      isOpen={isModalOpen}
+      onClose={closePaymentsModal}
+      studentId={selectedStudentId}
+      courseId={courseId}
+    />
+  </div>
+);
+
 }
