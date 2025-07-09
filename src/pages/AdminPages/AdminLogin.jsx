@@ -101,6 +101,7 @@ export default function AdminLogin() {
 
       const token = await result.user.getIdToken();
       localStorage.setItem("adminToken", token);
+      localStorage.setItem("userRole", "admin"); // Store role for Navbar
       await checkProfileAndNavigate(token);
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));
