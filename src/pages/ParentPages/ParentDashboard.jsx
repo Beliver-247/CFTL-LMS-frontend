@@ -80,13 +80,6 @@ export default function ParentDashboard() {
               <FaUserGraduate className="text-3xl" />
               <h1 className="text-2xl font-bold">Parent Dashboard</h1>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors"
-            >
-              <FaSignOutAlt />
-              <span>Logout</span>
-            </button>
           </div>
         </div>
       </header>

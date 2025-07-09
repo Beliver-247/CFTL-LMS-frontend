@@ -29,6 +29,7 @@ import EditStudent from "./pages/StudentPages/EditStudent";
 import ManageStudents from "./pages/StudentPages/ManageStudents";
 import EnrolledStudents from "./pages/CoordinatorPages/EnrolledStudents";
 import StudentDetails from "./pages/StudentPages/StudentDetails";
+import PaymentStatusMy from "./pages/ParentPages/PaymentStatusMy";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/parent-login" element={<ParentLogin />} />
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
+          <Route path="/payment-status" element={<PaymentStatusMy />} />
           <Route path="/student-register" element={<StudentRegister />} />
           <Route
             path="/admin/manage-students"
