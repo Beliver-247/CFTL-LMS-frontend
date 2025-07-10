@@ -14,15 +14,16 @@ export default function StudentPaymentsModal({
   const [payments, setPayments] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // <-- Add loading state
 
   const formatRs = (num) =>
-  `Rs. ${Number(num).toLocaleString("en-LK", { minimumFractionDigits: 0 })}`;
-
+    `Rs. ${Number(num).toLocaleString("en-LK", { minimumFractionDigits: 0 })}`;
 
   useEffect(() => {
     if (!isOpen || !studentId) return;
 
     const fetchPayments = async () => {
+      setLoading(true); // <-- Start loading
       try {
         const res = await axios.get(
           `${baseURL}/api/payments/student/${studentId}`,
@@ -38,6 +39,8 @@ export default function StudentPaymentsModal({
         setError("");
       } catch (err) {
         setError("Failed to load payment data");
+      } finally {
+        setLoading(false); // <-- End loading
       }
     };
 
@@ -56,7 +59,6 @@ export default function StudentPaymentsModal({
       await Promise.all(
         payments.map((p) => {
           const amountPaid = Number(p.amountPaid) || 0;
-          const originalDue = Number(p.amountDue) || 0;
 
           return axios.put(
             `${baseURL}/api/payments/${p.id}`,
@@ -84,8 +86,8 @@ export default function StudentPaymentsModal({
 
   const formatMonthName = (monthStr) => {
     const [year, month] = monthStr.split("-").map(Number);
-    const date = new Date(year, month - 1); // JS months are 0-based
-    return date.toLocaleString("default", { month: "short" }); // e.g., Jan, Feb
+    const date = new Date(year, month - 1);
+    return date.toLocaleString("default", { month: "short" });
   };
 
   return (
@@ -101,7 +103,11 @@ export default function StudentPaymentsModal({
         <h2 className="text-xl font-bold mb-4">Payment Details</h2>
         {error && <p className="text-red-600 mb-4">{error}</p>}
 
-        {payments.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-10">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        ) : payments.length === 0 ? (
           <p>No payment records found.</p>
         ) : (
           <div className="overflow-x-auto">
@@ -128,85 +134,79 @@ export default function StudentPaymentsModal({
               </thead>
               <tbody>
                 {payments.map((p) => (
-                 <tr key={p.id} className="border-t">
-  <td className="p-2 border">
-    {p.month} ({formatMonthName(p.month)})
-  </td>
-
-  <td className="p-2 border">{formatRs(p.amountDue)}</td>
-
-  <td className="p-2 border">
-    <input
-      type="number"
-      value={p.amountPaid}
-      step={1000}
-      onChange={(e) =>
-        handleChange(p.id, "amountPaid", e.target.value)
-      }
-      className="border px-2 py-1 w-24 rounded"
-    />
-  </td>
-
-<td className="p-2 border">{formatRs(p.remainingAmount)}</td>
-
-
-  <td className="p-2 border">
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-        p.amountPaid >= p.amountDue
-          ? "bg-green-100 text-green-800"
-          : p.amountPaid > 0
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-red-100 text-red-700"
-      }`}
-    >
-      {p.amountPaid >= p.amountDue
-        ? "Paid"
-        : p.amountPaid > 0
-        ? "Incomplete"
-        : "Unpaid"}
-    </span>
-  </td>
-
-  <td>
-    <input
-      type="date"
-      value={p.paidOn || ""}
-      onChange={(e) =>
-        handleChange(p.id, "paidOn", e.target.value)
-      }
-      className="border px-2 py-1 rounded"
-    />
-  </td>
-
-  <td className="p-2 border">
-    <input
-      type="text"
-      value={p.transactionId || ""}
-      onChange={(e) =>
-        handleChange(p.id, "transactionId", e.target.value)
-      }
-      className="border px-2 py-1 rounded"
-    />
-  </td>
-</tr>
-
+                  <tr key={p.id} className="border-t">
+                    <td className="p-2 border">
+                      {p.month} ({formatMonthName(p.month)})
+                    </td>
+                    <td className="p-2 border">{formatRs(p.amountDue)}</td>
+                    <td className="p-2 border">
+                      <input
+                        type="number"
+                        value={p.amountPaid}
+                        step={1000}
+                        onChange={(e) =>
+                          handleChange(p.id, "amountPaid", e.target.value)
+                        }
+                        className="border px-2 py-1 w-24 rounded"
+                      />
+                    </td>
+                    <td className="p-2 border">{formatRs(p.remainingAmount)}</td>
+                    <td className="p-2 border">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          p.amountPaid >= p.amountDue
+                            ? "bg-green-100 text-green-800"
+                            : p.amountPaid > 0
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {p.amountPaid >= p.amountDue
+                          ? "Paid"
+                          : p.amountPaid > 0
+                          ? "Incomplete"
+                          : "Unpaid"}
+                      </span>
+                    </td>
+                    <td className="p-2 border">
+                      <input
+                        type="date"
+                        value={p.paidOn || ""}
+                        onChange={(e) =>
+                          handleChange(p.id, "paidOn", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded"
+                      />
+                    </td>
+                    <td className="p-2 border">
+                      <input
+                        type="text"
+                        value={p.transactionId || ""}
+                        onChange={(e) =>
+                          handleChange(p.id, "transactionId", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded"
+                      />
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
 
-        <div className="mt-4 text-right">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
-          >
-            <FaSave />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
+        {!loading && (
+          <div className="mt-4 text-right">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
+            >
+              <FaSave />
+              {isSaving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
