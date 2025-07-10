@@ -106,7 +106,7 @@ export default function ParentDashboard() {
 
           {/* Disciplinary Records */}
           <div 
-            onClick={() => navigate('/disciplinary-records')}
+            onClick={() => alert("page under construction")}
             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
           >
             <div className="p-6 flex items-center">
@@ -122,7 +122,7 @@ export default function ParentDashboard() {
 
           {/* Exam Results */}
           <div 
-            onClick={() => navigate('/exam-results')}
+            onClick={() => alert("page under construction")}
             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
           >
             <div className="p-6 flex items-center">
@@ -138,7 +138,7 @@ export default function ParentDashboard() {
 
           {/* Academic Timetables */}
           <div 
-            onClick={() => navigate('/academic-timetables')}
+            onClick={() => alert("page under construction")}
             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
           >
             <div className="p-6 flex items-center">
