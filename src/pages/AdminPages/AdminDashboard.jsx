@@ -90,17 +90,6 @@ export default function AdminDashboard() {
             <FaUser className="text-3xl" />
             <span>Admin Dashboard</span>
           </h1>
-          {/* <button
-            onClick={async () => {
-              await auth.signOut();
-              localStorage.removeItem("adminToken");
-              window.location.href = "/admin-login";
-            }}
-            className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors"
-          >
-            <FaSignOutAlt />
-            <span>Logout</span>
-          </button> */}
         </div>
       </header>
 
