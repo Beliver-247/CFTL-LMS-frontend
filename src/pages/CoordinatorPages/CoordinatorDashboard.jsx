@@ -70,13 +70,6 @@ export default function CoordinatorDashboard() {
             <FaUserTie className="text-3xl" />
             <span>Coordinator Dashboard</span>
           </h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors"
-          >
-            <FaSignOutAlt />
-            <span>Logout</span>
-          </button>
         </div>
       </header>
 
