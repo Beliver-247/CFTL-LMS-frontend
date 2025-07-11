@@ -30,6 +30,7 @@ import ManageStudents from "./pages/StudentPages/ManageStudents";
 import EnrolledStudents from "./pages/CoordinatorPages/EnrolledStudents";
 import StudentDetails from "./pages/StudentPages/StudentDetails";
 import PaymentStatusMy from "./pages/ParentPages/PaymentStatusMy";
+import ManagePaymentRequests from "./pages/CoordinatorPages/ManagePaymentRequests";
 
 export default function App() {
   return (
@@ -61,6 +62,16 @@ export default function App() {
             }
           />
           <Route
+            path="/coordinator/manage-payment-requests"
+            element={
+              <ProtectedRoute
+                element={ManagePaymentRequests}
+                allowedRoles={["coordinator"]}
+              />
+            }
+          />
+
+          <Route
             path="/admin/students/:id/edit"
             element={
               <ProtectedRoute element={EditStudent} allowedRoles={["admin"]} />
@@ -76,7 +87,6 @@ export default function App() {
             }
           />
           <Route path="/admin/students/:id" element={<StudentDetails />} />
-
 
           <Route
             path="/admin-login"

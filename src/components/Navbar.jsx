@@ -59,6 +59,7 @@ export default function Navbar() {
     ],
     coordinator: [
       { path: '/coordinator-dashboard', name: 'Dashboard', icon: <FaUser className="mr-1" /> },
+      { path: '/coordinator/manage-payment-requests', name: 'Manage Payments' },
       { path: '/coordinator/enrolled-students', name: 'View Enrolled Students' }
     ]
   };
