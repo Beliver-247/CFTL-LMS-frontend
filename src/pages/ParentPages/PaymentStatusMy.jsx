@@ -12,7 +12,12 @@ export default function PaymentStatusMy() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [payments, setPayments] = useState([]);
   const [studentMap, setStudentMap] = useState({});
+  const [modalData, setModalData] = useState(null);
+  const [file, setFile] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +26,6 @@ export default function PaymentStatusMy() {
 
     const fetchPaymentsAndStudents = async () => {
       try {
-        // 1. Get children info
         const studentsRes = await axios.get(`${baseURL}/api/parents/children`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -32,7 +36,6 @@ export default function PaymentStatusMy() {
         }
         setStudentMap(studentMap);
 
-        // 2. Get payments
         const paymentsRes = await axios.get(`${baseURL}/api/payments/parent/children`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -58,14 +61,87 @@ export default function PaymentStatusMy() {
     }
   };
 
-  if (error)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      </div>
-    );
+  const handleSubmit = async () => {
+    if (!modalData || !file || !amount) {
+      setError('All fields are required.');
+      return;
+    }
+
+    if (Number(amount) > modalData.remainingAmount) {
+      setError('Amount cannot exceed remaining balance.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      const token = localStorage.getItem('token');
+
+      // 1. Request signed URL
+      const uploadRes = await axios.post(
+        `${baseURL}/api/uploads/signed-url`,
+        {
+          fileName: file.name,
+          fileType: file.type,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const { uploadUrl, receiptUrl } = uploadRes.data;
+
+      // 2. Upload file to GCS
+      await axios.put(uploadUrl, file, {
+        headers: { 'Content-Type': file.type },
+      });
+
+      // 3. Send payment request
+      await axios.post(
+        `${baseURL}/api/payment-requests`,
+        {
+          paymentId: modalData.id,
+          studentId: modalData.studentId,
+          courseId: modalData.courseId,
+          month: modalData.month,
+          amountRequested: Number(amount),
+          remainingAmount: modalData.remainingAmount,
+          receiptUrl,
+          paymentDate: modalData.month,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setSuccess('Payment request submitted successfully!');
+      setModalData(null);
+      setAmount('');
+      setFile(null);
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.error || 'Failed to submit request.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openModal = (payment) => {
+    setModalData(payment);
+    setAmount('');
+    setFile(null);
+    setError('');
+    setSuccess('');
+  };
+
+  const closeModal = () => {
+    setModalData(null);
+    setAmount('');
+    setFile(null);
+    setError('');
+    setSuccess('');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -78,6 +154,9 @@ export default function PaymentStatusMy() {
 
       <h1 className="text-2xl font-bold mb-6">Payment Status</h1>
 
+      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
+      {success && <div className="bg-green-100 text-green-700 p-2 rounded mb-4">{success}</div>}
+
       {payments.length === 0 ? (
         <p className="text-gray-600">No payment records found.</p>
       ) : (
@@ -85,40 +164,79 @@ export default function PaymentStatusMy() {
           {payments.map((p) => (
             <div
               key={p.id}
-              className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow relative"
             >
               <div className="flex items-center mb-2">
                 {renderStatusIcon(p.status)}
                 <h3 className="text-lg font-semibold">{p.status}</h3>
               </div>
-              <p className="text-gray-600">
-                <span className="font-medium">Student:</span>{' '}
-                {studentMap[p.studentId] || p.studentId}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Month:</span> {p.month}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Amount Due:</span> Rs. {p.amountDue}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Amount Paid:</span> Rs. {p.amountPaid}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Remaining:</span> Rs. {p.remainingAmount}
-              </p>
-              {p.paidOn && (
-                <p className="text-gray-600">
-                  <span className="font-medium">Paid On:</span> {p.paidOn}
-                </p>
-              )}
-              {p.transactionId && (
-                <p className="text-gray-600">
-                  <span className="font-medium">Transaction ID:</span> {p.transactionId}
-                </p>
+              <p><strong>Student:</strong> {studentMap[p.studentId]}</p>
+              <p><strong>Month:</strong> {p.month}</p>
+              <p><strong>Amount Due:</strong> Rs. {p.amountDue}</p>
+              <p><strong>Amount Paid:</strong> Rs. {p.amountPaid}</p>
+              <p><strong>Remaining:</strong> Rs. {p.remainingAmount}</p>
+              {p.paidOn && <p><strong>Paid On:</strong> {p.paidOn}</p>}
+              {p.transactionId && <p><strong>Transaction ID:</strong> {p.transactionId}</p>}
+
+              {(p.status === 'Unpaid' || p.status === 'Incomplete') && (
+                <button
+                  onClick={() => openModal(p)}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Mark as Paid
+                </button>
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {modalData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">Mark as Paid</h2>
+            <p><strong>Student:</strong> {studentMap[modalData.studentId]}</p>
+            <p><strong>Month:</strong> {modalData.month}</p>
+            <p><strong>Remaining:</strong> Rs. {modalData.remainingAmount}</p>
+            <p><strong>Payment Due Date:</strong> {modalData.month}</p>
+            <p><strong>Current Date:</strong> {new Date().toLocaleDateString()}</p>
+
+            <div className="mt-4">
+              <label className="block font-medium">Amount</label>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
+              />
+            </div>
+
+            <div className="mt-4">
+              <label className="block font-medium">Receipt Upload (.jpg, .png, .pdf)</label>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.pdf"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="mt-1"
+              />
+            </div>
+
+            <div className="flex justify-end mt-6 space-x-3">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                disabled={loading}
+              >
+                {loading ? 'Submitting...' : 'Submit Request'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
