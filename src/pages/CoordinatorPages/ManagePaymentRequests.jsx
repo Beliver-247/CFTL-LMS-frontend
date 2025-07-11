@@ -7,8 +7,8 @@ export default function ManagePaymentRequests() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     fetchRequests();
@@ -17,13 +17,19 @@ export default function ManagePaymentRequests() {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const res = await axios.get(`${baseURL}/api/payment-requests`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.get(
+        `${baseURL}/api/payment-requests/coordinator`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       setRequests(res.data || []);
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to fetch payment requests.");
+      setError(
+        err.response?.data?.error || "Failed to fetch payment requests."
+      );
     } finally {
       setLoading(false);
     }
@@ -32,11 +38,15 @@ export default function ManagePaymentRequests() {
   const approveRequest = async (id) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      await axios.put(`${baseURL}/api/payment-requests/${id}/approve`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSuccess('Payment request approved successfully!');
+      const token = localStorage.getItem("adminToken");
+      await axios.put(
+        `${baseURL}/api/payment-requests/${id}/approve`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSuccess("Payment request approved successfully!");
       fetchRequests(); // refresh
     } catch (err) {
       setError(err.response?.data?.error || "Approval failed.");
@@ -47,8 +57,10 @@ export default function ManagePaymentRequests() {
 
   const handleViewReceipt = async (receiptUrl) => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const filePath = decodeURIComponent(new URL(receiptUrl).pathname.split("/o/")[1].split("?")[0]);
+      const token = localStorage.getItem("adminToken");
+      const filePath = decodeURIComponent(
+        new URL(receiptUrl).pathname.split("/o/")[1].split("?")[0]
+      );
 
       const res = await axios.post(
         `${baseURL}/api/uploads/view-url`,
@@ -56,7 +68,7 @@ export default function ManagePaymentRequests() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      window.open(res.data.signedUrl, '_blank');
+      window.open(res.data.signedUrl, "_blank");
     } catch (err) {
       console.error(err);
       setError("Could not generate secure receipt link.");
@@ -65,11 +77,11 @@ export default function ManagePaymentRequests() {
 
   const renderStatus = (status) => {
     switch (status) {
-      case 'approved':
+      case "approved":
         return <FaCheckCircle className="text-green-600 mr-1" />;
-      case 'pending':
+      case "pending":
         return <FaClock className="text-yellow-600 mr-1" />;
-      case 'rejected':
+      case "rejected":
         return <FaTimesCircle className="text-red-600 mr-1" />;
       default:
         return null;
@@ -80,8 +92,14 @@ export default function ManagePaymentRequests() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Manage Payment Requests</h1>
 
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-      {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4">{success}</div>}
+      {error && (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
+      )}
+      {success && (
+        <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
+          {success}
+        </div>
+      )}
 
       {loading ? (
         <p>Loading...</p>
@@ -90,18 +108,37 @@ export default function ManagePaymentRequests() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {requests.map((req) => (
-            <div key={req.id} className="bg-white rounded-lg shadow-md p-5 relative">
+            <div
+              key={req.id}
+              className="bg-white rounded-lg shadow-md p-5 relative"
+            >
               <div className="flex items-center mb-2">
                 {renderStatus(req.status)}
-                <h2 className="text-lg font-semibold">{req.status.toUpperCase()}</h2>
+                <h2 className="text-lg font-semibold">
+                  {req.status.toUpperCase()}
+                </h2>
               </div>
-              <p><strong>Student ID:</strong> {req.studentId}</p>
-              <p><strong>Course ID:</strong> {req.courseId}</p>
-              <p><strong>Month:</strong> {req.month}</p>
-              <p><strong>Amount:</strong> Rs. {req.amountRequested}</p>
-              <p><strong>Requested On:</strong> {new Date(req.requestedOn?.seconds * 1000).toLocaleDateString()}</p>
-              {req.status === 'approved' && (
-                <p><strong>Approved By:</strong> {req.approvedBy}</p>
+              <p>
+                <strong>Student:</strong> {req.studentName}
+              </p>
+              <p>
+                <strong>Course:</strong> {req.courseName}
+              </p>
+
+              <p>
+                <strong>Month:</strong> {req.month}
+              </p>
+              <p>
+                <strong>Amount:</strong> Rs. {req.amountRequested}
+              </p>
+              <p>
+                <strong>Requested On:</strong>{" "}
+                {new Date(req.requestedOn?.seconds * 1000).toLocaleDateString()}
+              </p>
+              {req.status === "approved" && (
+                <p>
+                  <strong>Approved By:</strong> {req.approvedBy}
+                </p>
               )}
 
               <button
@@ -111,7 +148,7 @@ export default function ManagePaymentRequests() {
                 View Receipt
               </button>
 
-              {req.status === 'pending' && (
+              {req.status === "pending" && (
                 <button
                   onClick={() => approveRequest(req.id)}
                   className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"

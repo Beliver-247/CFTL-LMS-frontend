@@ -31,6 +31,7 @@ import EnrolledStudents from "./pages/CoordinatorPages/EnrolledStudents";
 import StudentDetails from "./pages/StudentPages/StudentDetails";
 import PaymentStatusMy from "./pages/ParentPages/PaymentStatusMy";
 import ManagePaymentRequests from "./pages/CoordinatorPages/ManagePaymentRequests";
+import ViewPaymentStatus from "./pages/ParentPages/ViewPaymentStatus";
 
 export default function App() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/payment-status" element={<PaymentStatusMy />} />
           <Route path="/student-register" element={<StudentRegister />} />
+          <Route path="/view-payment-requests" element={<ViewPaymentStatus />} />
           <Route
             path="/admin/manage-students"
             element={
