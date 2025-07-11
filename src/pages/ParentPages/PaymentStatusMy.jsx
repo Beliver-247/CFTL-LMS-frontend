@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
 import {
   FaArrowLeft,
   FaCheckCircle,
   FaExclamationCircle,
   FaHourglassHalf,
-} from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function PaymentStatusMy() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -14,15 +14,15 @@ export default function PaymentStatusMy() {
   const [studentMap, setStudentMap] = useState({});
   const [modalData, setModalData] = useState(null);
   const [file, setFile] = useState(null);
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return navigate('/parent-login');
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/parent-login");
 
     const fetchPaymentsAndStudents = async () => {
       try {
@@ -32,17 +32,23 @@ export default function PaymentStatusMy() {
 
         const studentMap = {};
         for (const s of studentsRes.data || []) {
-          studentMap[s.id] = s.nameFull || 'Unnamed Student';
+          studentMap[s.id] = s.nameFull || "Unnamed Student";
         }
         setStudentMap(studentMap);
 
-        const paymentsRes = await axios.get(`${baseURL}/api/payments/parent/children`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const paymentsRes = await axios.get(
+          `${baseURL}/api/payments/parent/children`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-        setPayments(paymentsRes.data || []);
+        const sortedPayments = (paymentsRes.data || []).sort(
+          (a, b) => new Date(a.month) - new Date(b.month)
+        );
+        setPayments(sortedPayments);
       } catch (err) {
-        setError(err.response?.data?.error || 'Could not fetch payment data.');
+        setError(err.response?.data?.error || "Could not fetch payment data.");
       }
     };
 
@@ -51,11 +57,11 @@ export default function PaymentStatusMy() {
 
   const renderStatusIcon = (status) => {
     switch (status) {
-      case 'Paid':
+      case "Paid":
         return <FaCheckCircle className="text-green-500 mr-2" />;
-      case 'Incomplete':
+      case "Incomplete":
         return <FaHourglassHalf className="text-yellow-500 mr-2" />;
-      case 'Unpaid':
+      case "Unpaid":
       default:
         return <FaExclamationCircle className="text-red-500 mr-2" />;
     }
@@ -63,19 +69,19 @@ export default function PaymentStatusMy() {
 
   const handleSubmit = async () => {
     if (!modalData || !file || !amount) {
-      setError('All fields are required.');
+      setError("All fields are required.");
       return;
     }
 
     if (Number(amount) > modalData.remainingAmount) {
-      setError('Amount cannot exceed remaining balance.');
+      setError("Amount cannot exceed remaining balance.");
       return;
     }
 
     try {
       setLoading(true);
-      setError('');
-      const token = localStorage.getItem('token');
+      setError("");
+      const token = localStorage.getItem("token");
 
       // 1. Request signed URL
       const uploadRes = await axios.post(
@@ -93,7 +99,7 @@ export default function PaymentStatusMy() {
 
       // 2. Upload file to GCS
       await axios.put(uploadUrl, file, {
-        headers: { 'Content-Type': file.type },
+        headers: { "Content-Type": file.type },
       });
 
       // 3. Send payment request
@@ -114,14 +120,14 @@ export default function PaymentStatusMy() {
         }
       );
 
-      setSuccess('Payment request submitted successfully!');
+      setSuccess("Payment request submitted successfully!");
       setModalData(null);
-      setAmount('');
+      setAmount("");
       setFile(null);
       setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || 'Failed to submit request.');
+      setError(err.response?.data?.error || "Failed to submit request.");
     } finally {
       setLoading(false);
     }
@@ -129,24 +135,24 @@ export default function PaymentStatusMy() {
 
   const openModal = (payment) => {
     setModalData(payment);
-    setAmount('');
+    setAmount("");
     setFile(null);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
   };
 
   const closeModal = () => {
     setModalData(null);
-    setAmount('');
+    setAmount("");
     setFile(null);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <button
-        onClick={() => navigate('/parent-dashboard')}
+        onClick={() => navigate("/parent-dashboard")}
         className="flex items-center text-blue-600 mb-4 hover:underline"
       >
         <FaArrowLeft className="mr-2" /> Back to Dashboard
@@ -154,8 +160,14 @@ export default function PaymentStatusMy() {
 
       <h1 className="text-2xl font-bold mb-6">Payment Status</h1>
 
-      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
-      {success && <div className="bg-green-100 text-green-700 p-2 rounded mb-4">{success}</div>}
+      {error && (
+        <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>
+      )}
+      {success && (
+        <div className="bg-green-100 text-green-700 p-2 rounded mb-4">
+          {success}
+        </div>
+      )}
 
       {payments.length === 0 ? (
         <p className="text-gray-600">No payment records found.</p>
@@ -170,15 +182,36 @@ export default function PaymentStatusMy() {
                 {renderStatusIcon(p.status)}
                 <h3 className="text-lg font-semibold">{p.status}</h3>
               </div>
-              <p><strong>Student:</strong> {studentMap[p.studentId]}</p>
-              <p><strong>Month:</strong> {p.month}</p>
-              <p><strong>Amount Due:</strong> Rs. {p.amountDue}</p>
-              <p><strong>Amount Paid:</strong> Rs. {p.amountPaid}</p>
-              <p><strong>Remaining:</strong> Rs. {p.remainingAmount}</p>
-              {p.paidOn && <p><strong>Paid On:</strong> {p.paidOn}</p>}
-              {p.transactionId && <p><strong>Transaction ID:</strong> {p.transactionId}</p>}
+              <p>
+                <strong>Student:</strong> {studentMap[p.studentId]}
+              </p>
+              <p>
+                <strong>Course:</strong> {p.courseName}
+              </p>
+              <p>
+                <strong>Month:</strong> {p.month}
+              </p>
+              <p>
+                <strong>Amount Due:</strong> Rs. {p.amountDue}
+              </p>
+              <p>
+                <strong>Amount Paid:</strong> Rs. {p.amountPaid}
+              </p>
+              <p>
+                <strong>Remaining:</strong> Rs. {p.remainingAmount}
+              </p>
+              {p.paidOn && (
+                <p>
+                  <strong>Paid On:</strong> {p.paidOn}
+                </p>
+              )}
+              {p.transactionId && (
+                <p>
+                  <strong>Transaction ID:</strong> {p.transactionId}
+                </p>
+              )}
 
-              {(p.status === 'Unpaid' || p.status === 'Incomplete') && (
+              {(p.status === "Unpaid" || p.status === "Incomplete") && (
                 <button
                   onClick={() => openModal(p)}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -195,11 +228,21 @@ export default function PaymentStatusMy() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-lg">
             <h2 className="text-xl font-bold mb-4">Mark as Paid</h2>
-            <p><strong>Student:</strong> {studentMap[modalData.studentId]}</p>
-            <p><strong>Month:</strong> {modalData.month}</p>
-            <p><strong>Remaining:</strong> Rs. {modalData.remainingAmount}</p>
-            <p><strong>Payment Due Date:</strong> {modalData.month}</p>
-            <p><strong>Current Date:</strong> {new Date().toLocaleDateString()}</p>
+            <p>
+              <strong>Student:</strong> {studentMap[modalData.studentId]}
+            </p>
+            <p>
+              <strong>Month:</strong> {modalData.month}
+            </p>
+            <p>
+              <strong>Remaining:</strong> Rs. {modalData.remainingAmount}
+            </p>
+            <p>
+              <strong>Payment Due Date:</strong> {modalData.month}
+            </p>
+            <p>
+              <strong>Current Date:</strong> {new Date().toLocaleDateString()}
+            </p>
 
             <div className="mt-4">
               <label className="block font-medium">Amount</label>
@@ -212,7 +255,9 @@ export default function PaymentStatusMy() {
             </div>
 
             <div className="mt-4">
-              <label className="block font-medium">Receipt Upload (.jpg, .png, .pdf)</label>
+              <label className="block font-medium">
+                Receipt Upload (.jpg, .png, .pdf)
+              </label>
               <input
                 type="file"
                 accept=".jpg,.jpeg,.png,.pdf"
@@ -233,7 +278,7 @@ export default function PaymentStatusMy() {
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                 disabled={loading}
               >
-                {loading ? 'Submitting...' : 'Submit Request'}
+                {loading ? "Submitting..." : "Submit Request"}
               </button>
             </div>
           </div>

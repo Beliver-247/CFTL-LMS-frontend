@@ -40,8 +40,7 @@ export default function Navbar() {
     ],
     parent: [
       { path: '/parent-dashboard', name: 'Dashboard' },
-      { path: '/parent-children', name: 'My Children' },
-      { path: '/parent-payments', name: 'Payments' },
+      { path: '/view-payment-requests', name: 'View Payment Requests' },
       { path: '/parent-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
     ],
     student: [
