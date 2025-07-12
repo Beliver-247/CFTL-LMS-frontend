@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 export default function PaymentStatusMy() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [payments, setPayments] = useState([]);
+  const [paymentRequests, setPaymentRequests] = useState([]);
   const [studentMap, setStudentMap] = useState({});
   const [modalData, setModalData] = useState(null);
   const [file, setFile] = useState(null);
@@ -18,17 +19,22 @@ export default function PaymentStatusMy() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [blockedReason, setBlockedReason] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return navigate("/parent-login");
 
-    const fetchPaymentsAndStudents = async () => {
+    const fetchPaymentsAndRequests = async () => {
       try {
-        const studentsRes = await axios.get(`${baseURL}/api/parents/children`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+
+        const [studentsRes, paymentsRes, requestsRes] = await Promise.all([
+          axios.get(`${baseURL}/api/parents/children`, authHeader),
+          axios.get(`${baseURL}/api/payments/parent/children`, authHeader),
+          axios.get(`${baseURL}/api/payment-requests/parent`, authHeader),
+        ]);
 
         const studentMap = {};
         for (const s of studentsRes.data || []) {
@@ -36,23 +42,17 @@ export default function PaymentStatusMy() {
         }
         setStudentMap(studentMap);
 
-        const paymentsRes = await axios.get(
-          `${baseURL}/api/payments/parent/children`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
         const sortedPayments = (paymentsRes.data || []).sort(
           (a, b) => new Date(a.month) - new Date(b.month)
         );
         setPayments(sortedPayments);
+        setPaymentRequests(requestsRes.data || []);
       } catch (err) {
         setError(err.response?.data?.error || "Could not fetch payment data.");
       }
     };
 
-    fetchPaymentsAndStudents();
+    fetchPaymentsAndRequests();
   }, [navigate]);
 
   const renderStatusIcon = (status) => {
@@ -65,6 +65,38 @@ export default function PaymentStatusMy() {
       default:
         return <FaExclamationCircle className="text-red-500 mr-2" />;
     }
+  };
+
+  const openModal = (payment) => {
+    const requestsForPayment = paymentRequests.filter(
+      (r) => r.paymentId === payment.id
+    );
+
+    const hasPending = requestsForPayment.some((r) => r.status === "pending");
+    const maxReached = requestsForPayment.length >= 3;
+
+    if (hasPending) {
+      setBlockedReason("You already have a pending request for this payment.");
+    } else if (maxReached) {
+      setBlockedReason("You have reached the maximum of 3 requests for this payment.");
+    } else {
+      setBlockedReason("");
+    }
+
+    setModalData(payment);
+    setAmount("");
+    setFile(null);
+    setError("");
+    setSuccess("");
+  };
+
+  const closeModal = () => {
+    setModalData(null);
+    setAmount("");
+    setFile(null);
+    setError("");
+    setSuccess("");
+    setBlockedReason("");
   };
 
   const handleSubmit = async () => {
@@ -83,7 +115,6 @@ export default function PaymentStatusMy() {
       setError("");
       const token = localStorage.getItem("token");
 
-      // 1. Request signed URL
       const uploadRes = await axios.post(
         `${baseURL}/api/uploads/signed-url`,
         {
@@ -97,12 +128,10 @@ export default function PaymentStatusMy() {
 
       const { uploadUrl, receiptUrl } = uploadRes.data;
 
-      // 2. Upload file to GCS
       await axios.put(uploadUrl, file, {
         headers: { "Content-Type": file.type },
       });
 
-      // 3. Send payment request
       await axios.post(
         `${baseURL}/api/payment-requests`,
         {
@@ -121,9 +150,6 @@ export default function PaymentStatusMy() {
       );
 
       setSuccess("Payment request submitted successfully!");
-      setModalData(null);
-      setAmount("");
-      setFile(null);
       setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
       console.error(err);
@@ -131,22 +157,6 @@ export default function PaymentStatusMy() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const openModal = (payment) => {
-    setModalData(payment);
-    setAmount("");
-    setFile(null);
-    setError("");
-    setSuccess("");
-  };
-
-  const closeModal = () => {
-    setModalData(null);
-    setAmount("");
-    setFile(null);
-    setError("");
-    setSuccess("");
   };
 
   return (
@@ -212,12 +222,21 @@ export default function PaymentStatusMy() {
               )}
 
               {(p.status === "Unpaid" || p.status === "Incomplete") && (
-                <button
-                  onClick={() => openModal(p)}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Mark as Paid
-                </button>
+                <div className="flex space-x-2 mt-4">
+                  <button
+                    onClick={() => openModal(p)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Mark as Paid
+                  </button>
+                  <button
+                    onClick={() => openModal(p)}
+                    title="Make another payment"
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    +
+                  </button>
+                </div>
               )}
             </div>
           ))}
@@ -244,27 +263,33 @@ export default function PaymentStatusMy() {
               <strong>Current Date:</strong> {new Date().toLocaleDateString()}
             </p>
 
-            <div className="mt-4">
-              <label className="block font-medium">Amount</label>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
-              />
-            </div>
+            {blockedReason ? (
+              <div className="text-red-600 font-semibold mt-4">{blockedReason}</div>
+            ) : (
+              <>
+                <div className="mt-4">
+                  <label className="block font-medium">Amount</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
+                  />
+                </div>
 
-            <div className="mt-4">
-              <label className="block font-medium">
-                Receipt Upload (.jpg, .png, .pdf)
-              </label>
-              <input
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                onChange={(e) => setFile(e.target.files[0])}
-                className="mt-1"
-              />
-            </div>
+                <div className="mt-4">
+                  <label className="block font-medium">
+                    Receipt Upload (.jpg, .png, .pdf)
+                  </label>
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    className="mt-1"
+                  />
+                </div>
+              </>
+            )}
 
             <div className="flex justify-end mt-6 space-x-3">
               <button
@@ -276,7 +301,7 @@ export default function PaymentStatusMy() {
               <button
                 onClick={handleSubmit}
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                disabled={loading}
+                disabled={loading || !!blockedReason}
               >
                 {loading ? "Submitting..." : "Submit Request"}
               </button>
