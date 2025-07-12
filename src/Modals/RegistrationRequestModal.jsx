@@ -1,5 +1,5 @@
-// components/RegistrationRequestModal.jsx
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 export default function RegistrationRequestModal({ onClose }) {
@@ -59,7 +59,12 @@ export default function RegistrationRequestModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-lg w-full shadow-xl">
+      <motion.div
+        className="bg-white p-6 rounded-lg max-w-lg w-full shadow-xl"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
         <h2 className="text-2xl font-bold mb-4 text-red-800">Registration Request</h2>
 
         {success ? (
@@ -97,7 +102,7 @@ export default function RegistrationRequestModal({ onClose }) {
         <button onClick={onClose} className="mt-4 w-full text-center text-sm text-red-700 hover:underline">
           Close
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 }

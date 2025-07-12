@@ -24,12 +24,7 @@ export default function Navbar() {
   }, [location]);
 
   const roleItems = {
-    guest: [
-      { path: '/teacher-login', name: 'Teacher Login', icon: <FaChalkboardTeacher className="mr-1" /> },
-      { path: '/teacher-register', name: 'Teacher Register' },
-      { path: '/parent-login', name: 'Parent Login' },
-      { path: '/student-register', name: 'Student Register', icon: <FaGraduationCap className="mr-1" /> }
-    ],
+    guest: [],
     teacher: [
       { path: '/teacher-dashboard', name: 'Dashboard', icon: <FaChalkboardTeacher className="mr-1" /> },
       { path: '/teacher-courses', name: 'Courses' },
@@ -140,20 +135,12 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <div className="flex space-x-2">
-                  <Link
-                    to="/teacher-login"
-                    className="px-4 py-2 bg-red-700 rounded-md text-sm font-medium hover:bg-red-600"
-                  >
-                    Teacher Login
-                  </Link>
-                  <Link
-                    to="/parent-login"
-                    className="px-4 py-2 bg-red-600 rounded-md text-sm font-medium hover:bg-red-500"
-                  >
-                    Parent Login
-                  </Link>
-                </div>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 bg-white text-red-700 rounded-md text-sm font-medium hover:bg-red-100"
+                >
+                  Login
+                </Link>
               )}
             </div>
           </div>
@@ -206,20 +193,13 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="px-2 space-y-1">
+              <div className="px-2">
                 <Link
-                  to="/"
+                  to="/login"
                   className="block px-3 py-2 rounded-md text-base font-medium text-red-200 hover:text-white hover:bg-red-700"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Teacher Login
-                </Link>
-                <Link
-                  to="/parent-login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-red-200 hover:text-white hover:bg-red-700"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Parent Login
+                  Login
                 </Link>
               </div>
             )}
