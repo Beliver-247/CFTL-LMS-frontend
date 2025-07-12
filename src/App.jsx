@@ -32,6 +32,7 @@ import StudentDetails from "./pages/StudentPages/StudentDetails";
 import PaymentStatusMy from "./pages/ParentPages/PaymentStatusMy";
 import ManagePaymentRequests from "./pages/CoordinatorPages/ManagePaymentRequests";
 import ViewPaymentStatus from "./pages/ParentPages/ViewPaymentStatus";
+import UserLogin from "./pages/UserLogin";
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<UserLogin />} />
           <Route path="/parent-login" element={<ParentLogin />} />
           <Route path="/teacher-login" element={<TeacherLogin />} />
           <Route path="teacher-dashboard" element={<TeacherDashboard />} />

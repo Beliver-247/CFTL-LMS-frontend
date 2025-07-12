@@ -1,5 +1,5 @@
-// Home.jsx
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import RegistrationRequestModal from '../Modals/RegistrationRequestModal';
 import {
   FaLaptop,
@@ -20,7 +20,12 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative bg-red-800 text-white py-20 md:py-28">
         <div className="container mx-auto px-6 text-center">
-          <div className="max-w-3xl mx-auto">
+          <motion.div
+            className="max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
             <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
               Welcome to College of Fast Track Learning
             </h1>
@@ -35,7 +40,7 @@ export default function Home() {
                 Request Registration
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-white transform skew-y-1 -mb-8"></div>
       </section>
@@ -43,24 +48,45 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Choose CFTL?</h2>
+          <motion.h2
+            className="text-3xl font-bold text-center text-gray-800 mb-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            Why Choose CFTL?
+          </motion.h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[{ icon: FaLaptop, title: 'Modern E-Learning', desc: 'Accessible anytime, anywhere' },
               { icon: FaClock, title: 'Accelerated Programs', desc: 'Complete qualifications faster' },
               { icon: FaCertificate, title: 'Recognized Certifications', desc: 'Nationally accredited' },
               { icon: FaUsers, title: 'Expert Faculty', desc: 'Learn from professionals' }].map((f, idx) => (
-              <div key={idx} className="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md text-center">
+              <motion.div
+                key={idx}
+                className="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md text-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                viewport={{ once: true }}
+              >
                 <f.icon className="text-4xl text-red-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
                 <p className="text-gray-600">{f.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-red-700 text-white">
+      <motion.section
+        className="py-16 bg-red-700 text-white"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Begin Your Journey?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
@@ -73,7 +99,7 @@ export default function Home() {
             Request Registration
           </button>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white pt-12 pb-6">
