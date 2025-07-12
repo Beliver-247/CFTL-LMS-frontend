@@ -1,7 +1,12 @@
-// pages/CoordinatorPages/ManagePaymentRequests.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCheckCircle, FaClock, FaTimesCircle } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaClock,
+  FaTimesCircle,
+  FaEye,
+  FaTimes,
+} from "react-icons/fa";
 
 export default function ManagePaymentRequests() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -9,6 +14,10 @@ export default function ManagePaymentRequests() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rejectingId, setRejectingId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     fetchRequests();
@@ -24,7 +33,6 @@ export default function ManagePaymentRequests() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       setRequests(res.data || []);
     } catch (err) {
       setError(
@@ -55,6 +63,32 @@ export default function ManagePaymentRequests() {
     }
   };
 
+  const rejectRequest = async () => {
+    try {
+      if (!rejectionReason.trim()) {
+        setError("Rejection reason is required.");
+        return;
+      }
+
+      setLoading(true);
+      const token = localStorage.getItem("adminToken");
+      await axios.put(
+        `${baseURL}/api/payment-requests/${rejectingId}/reject`,
+        { rejectionReason },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSuccess("Payment request rejected successfully!");
+      closeModal();
+      fetchRequests();
+    } catch (err) {
+      setError(err.response?.data?.error || "Rejection failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleViewReceipt = async (receiptUrl) => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -73,6 +107,19 @@ export default function ManagePaymentRequests() {
       console.error(err);
       setError("Could not generate secure receipt link.");
     }
+  };
+
+  const openRejectModal = (id) => {
+    setRejectingId(id);
+    setRejectionReason("");
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setRejectingId(null);
+    setRejectionReason("");
+    setError("");
   };
 
   const renderStatus = (status) => {
@@ -114,7 +161,7 @@ export default function ManagePaymentRequests() {
             >
               <div className="flex items-center mb-2">
                 {renderStatus(req.status)}
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-lg font-semibold ml-1">
                   {req.status.toUpperCase()}
                 </h2>
               </div>
@@ -124,7 +171,6 @@ export default function ManagePaymentRequests() {
               <p>
                 <strong>Course:</strong> {req.courseName}
               </p>
-
               <p>
                 <strong>Month:</strong> {req.month}
               </p>
@@ -140,24 +186,66 @@ export default function ManagePaymentRequests() {
                   <strong>Approved By:</strong> {req.approvedBy}
                 </p>
               )}
-
+              {req.status === "rejected" && (
+                <p className="text-red-600 italic">
+                  <strong>Reason:</strong> {req.rejectionReason || "Not provided"}
+                </p>
+              )}
               <button
                 onClick={() => handleViewReceipt(req.receiptUrl)}
-                className="text-blue-600 hover:underline block mt-2"
+                className="text-blue-600 hover:underline block mt-2 flex items-center"
               >
-                View Receipt
+                <FaEye className="mr-1" /> View Receipt
               </button>
 
               {req.status === "pending" && (
-                <button
-                  onClick={() => approveRequest(req.id)}
-                  className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
-                >
-                  Approve Request
-                </button>
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={() => approveRequest(req.id)}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => openRejectModal(req.id)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+                  >
+                    Reject
+                  </button>
+                </div>
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+              <FaTimes />
+            </button>
+            <h2 className="text-xl font-bold mb-4">Reject Payment Request</h2>
+            <label className="block font-medium mb-1">Reason for Rejection</label>
+            <textarea
+              className="w-full border border-gray-300 rounded p-2"
+              rows={4}
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+            ></textarea>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={rejectRequest}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                disabled={loading}
+              >
+                {loading ? "Rejecting..." : "Submit Rejection"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
