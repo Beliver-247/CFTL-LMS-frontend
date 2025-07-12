@@ -59,7 +59,7 @@ export default function RegistrationRequestModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-lg w-full shadow-xl animate-fadeIn">
+      <div className="bg-white p-6 rounded-lg max-w-lg w-full shadow-xl">
         <h2 className="text-2xl font-bold mb-4 text-red-800">Registration Request</h2>
 
         {success ? (
