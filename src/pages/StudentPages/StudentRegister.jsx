@@ -223,7 +223,7 @@ export default function StudentRegister() {
   };
 
   const renderStepIndicator = () => {
-    const steps = ["Basic Information", "Parents' Details", "Nominee & Other"];
+    const steps = ["Basic Information", "Parents' Details", "Guardian & Other"];
     return (
       <div className="flex justify-between mb-8">
         {steps.map((step, index) => (
@@ -427,6 +427,7 @@ export default function StudentRegister() {
                     <option value="Catholicism">Catholicism</option>
                     <option value="Islam">Islam</option>
                     <option value="Hindu">Hindu</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
@@ -730,12 +731,12 @@ export default function StudentRegister() {
           {currentStep === 3 && (
             <div className="bg-blue-50 p-4 rounded-lg">
               <h3 className="text-xl font-semibold text-blue-800 mb-4">
-                Nominee & Other Details
+                Guardian & Other Details
               </h3>
               <div className="space-y-6">
                 <div>
                   <h4 className="text-lg font-medium text-gray-700 mb-2">
-                    Nominee Details
+                    Guardian Details
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>

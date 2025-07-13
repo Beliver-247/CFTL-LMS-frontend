@@ -15,6 +15,7 @@ import {
   FaHeartbeat,
   FaBook
 } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 export default function ParentDashboard() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -54,123 +55,119 @@ export default function ParentDashboard() {
   );
 
   if (!students.length) return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-end">
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center space-x-2 bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg transition-colors"
         >
           <FaSignOutAlt />
           <span>Logout</span>
         </button>
       </div>
-      <div className="bg-white rounded-xl shadow-md p-6 mt-4 text-center">
-        <p className="text-gray-600">No child records found.</p>
+      <div className="bg-white text-gray-700 rounded-xl shadow-md p-6 mt-4 text-center">
+        <p>No child records found.</p>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-blue-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <FaUserGraduate className="text-3xl" />
-              <h1 className="text-2xl font-bold">Parent Dashboard</h1>
-            </div>
+    <div className="min-h-screen bg-gray-900 bg-opacity-90 text-white px-4 py-10">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-between items-center mb-8"
+        >
+          <div className="flex items-center space-x-3">
+            <FaUserGraduate className="text-3xl text-red-200" />
+            <h1 className="text-3xl font-bold">Parent Dashboard</h1>
           </div>
-        </div>
-      </header>
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg"
+          >
+            <FaSignOutAlt />
+            <span>Logout</span>
+          </button>
+        </motion.div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Payment Status */}
-          <div 
-            onClick={() => navigate('/payment-status')}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-blue-100 p-3 rounded-full mr-4">
-                <FaMoneyBillWave className="text-blue-600 text-xl" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {[
+            {
+              title: 'Payment Status',
+              icon: <FaMoneyBillWave className="text-red-700 text-xl" />,
+              bg: 'bg-red-100',
+              desc: 'View fee payment history',
+              onClick: () => navigate('/payment-status')
+            },
+            {
+              title: 'Disciplinary Records',
+              icon: <FaClipboardList className="text-red-700 text-xl" />,
+              bg: 'bg-red-100',
+              desc: 'View behavior reports',
+              onClick: () => alert('page under construction')
+            },
+            {
+              title: 'Exam Results',
+              icon: <FaFileAlt className="text-red-700 text-xl" />,
+              bg: 'bg-red-100',
+              desc: 'View academic performance',
+              onClick: () => alert('page under construction')
+            },
+            {
+              title: 'Academic Timetables',
+              icon: <FaCalendarAlt className="text-red-700 text-xl" />,
+              bg: 'bg-red-100',
+              desc: 'View class schedules',
+              onClick: () => alert('page under construction')
+            }
+          ].map((card, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              onClick={card.onClick}
+              className={`bg-white text-gray-800 rounded-3xl shadow-lg p-6 flex items-center cursor-pointer hover:shadow-2xl transition-shadow`}
+            >
+              <div className={`${card.bg} p-3 rounded-full mr-4`}>
+                {card.icon}
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Payment Status</h3>
-                <p className="text-gray-500 text-sm">View fee payment history</p>
+                <h3 className="font-semibold text-lg">{card.title}</h3>
+                <p className="text-gray-500 text-sm">{card.desc}</p>
               </div>
-            </div>
-          </div>
-
-          {/* Disciplinary Records */}
-          <div 
-            onClick={() => alert("page under construction")}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-red-100 p-3 rounded-full mr-4">
-                <FaClipboardList className="text-red-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Disciplinary Records</h3>
-                <p className="text-gray-500 text-sm">View behavior reports</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Exam Results */}
-          <div 
-            onClick={() => alert("page under construction")}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-green-100 p-3 rounded-full mr-4">
-                <FaFileAlt className="text-green-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Exam Results</h3>
-                <p className="text-gray-500 text-sm">View academic performance</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Academic Timetables */}
-          <div 
-            onClick={() => alert("page under construction")}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="p-6 flex items-center">
-              <div className="bg-purple-100 p-3 rounded-full mr-4">
-                <FaCalendarAlt className="text-purple-600 text-xl" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Academic Timetables</h3>
-                <p className="text-gray-500 text-sm">View class schedules</p>
-              </div>
-            </div>
-          </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* Children List */}
-        <h2 className="text-xl font-semibold mb-4 flex items-center">
-          <FaChild className="mr-2 text-blue-600" />
+        <h2 className="text-2xl font-bold mb-4 flex items-center">
+          <FaChild className="mr-2 text-red-200" />
           My Children
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {students.map((s) => {
+          {students.map((s, index) => {
             const dobFormatted = s.dob
               ? new Date(s.dob._seconds * 1000).toLocaleDateString()
               : 'N/A';
 
             return (
-              <div key={s.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <motion.div
+                key={s.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white text-gray-800 rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
                 <div className="p-6">
                   <div className="flex items-center mb-4">
-                    <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <FaUserGraduate className="text-blue-600 text-xl" />
+                    <div className="bg-red-100 p-3 rounded-full mr-4">
+                      <FaUserGraduate className="text-red-700 text-xl" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">{s.nameFull}</h3>
@@ -225,11 +222,11 @@ export default function ParentDashboard() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
