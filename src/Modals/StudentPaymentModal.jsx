@@ -1,102 +1,212 @@
-// components/RegistrationRequestModal.jsx
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { FaTimes, FaSave } from "react-icons/fa";
 
-export default function RegistrationRequestModal({ onClose }) {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    program: 'OL',
-    stream: '',
-    year: '',
-    duration: '6 month',
-    startingMonth: ''
-  });
-  const [streamsVisible, setStreamsVisible] = useState(false);
-  const [months, setMonths] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-
+export default function StudentPaymentsModal({
+  isOpen,
+  onClose,
+  studentId,
+  courseId,
+}) {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
+  const token = localStorage.getItem("adminToken");
+
+  const [payments, setPayments] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const formatRs = (num) =>
+  `Rs. ${Number(num).toLocaleString("en-LK", { minimumFractionDigits: 0 })}`;
+
 
   useEffect(() => {
-    axios.get(`${baseURL}/api/registration-requests/starting-months`)
-      .then(res => {
-        setMonths(res.data.months);
-        setForm(f => ({ ...f, startingMonth: res.data.months[0] }));
-      })
-      .catch(() => setMonths([]));
-  }, [baseURL]);
+    if (!isOpen || !studentId) return;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    if (name === 'program') setStreamsVisible(value === 'AL');
+    const fetchPayments = async () => {
+      try {
+        const res = await axios.get(
+          `${baseURL}/api/payments/student/${studentId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const filtered = res.data
+          .filter((p) => p.courseId === courseId)
+          .sort((a, b) => a.month.localeCompare(b.month));
+
+        setPayments(filtered);
+        setError("");
+      } catch (err) {
+        setError("Failed to load payment data");
+      }
+    };
+
+    fetchPayments();
+  }, [isOpen, studentId, courseId]);
+
+  const handleChange = (id, field, value) => {
+    setPayments((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+    );
   };
 
-  const validate = () => {
-    if (form.name.trim().split(' ').length < 2) return 'Name must have at least two words.';
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) return 'Invalid email address.';
-    if (!/^\d{10}$/.test(form.phone)) return 'Phone number must be exactly 10 digits.';
-    if (form.program === 'AL' && !form.stream) return 'Stream is required for AL program.';
-    return null;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    const validationError = validate();
-    if (validationError) return setError(validationError);
-
+  const handleSave = async () => {
+    setIsSaving(true);
     try {
-      await axios.post(`${baseURL}/api/registration-requests`, form);
-      setSuccess(true);
+      await Promise.all(
+        payments.map((p) => {
+          const amountPaid = Number(p.amountPaid) || 0;
+          const originalDue = Number(p.amountDue) || 0;
+
+          return axios.put(
+            `${baseURL}/api/payments/${p.id}`,
+            {
+              amountPaid,
+              status: p.status,
+              paidOn: p.paidOn,
+              transactionId: p.transactionId,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+        })
+      );
+      onClose();
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong.');
+      alert("Failed to save some payments.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-lg w-full shadow-xl animate-fadeIn">
-        <h2 className="text-2xl font-bold mb-4 text-red-800">Registration Request</h2>
+  if (!isOpen) return null;
 
-        {success ? (
-          <div className="text-green-600 text-center mb-4">Your request has been submitted successfully.</div>
+  const formatMonthName = (monthStr) => {
+    const [year, month] = monthStr.split("-").map(Number);
+    const date = new Date(year, month - 1); // JS months are 0-based
+    return date.toLocaleString("default", { month: "short" }); // e.g., Jan, Feb
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-lg p-6 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-600 hover:text-red-600"
+        >
+          <FaTimes />
+        </button>
+
+        <h2 className="text-xl font-bold mb-4">Payment Details</h2>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+
+        {payments.length === 0 ? (
+          <p>No payment records found.</p>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Full Name" className="w-full border p-2 rounded" required />
-            <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Email" className="w-full border p-2 rounded" required />
-            <input type="tel" name="phone" value={form.phone} onChange={handleChange} maxLength="10" placeholder="Phone Number (10 digits)" className="w-full border p-2 rounded" required />
-            <select name="program" value={form.program} onChange={handleChange} className="w-full border p-2 rounded">
-              <option value="OL">OL</option>
-              <option value="AL">AL</option>
-            </select>
-            {streamsVisible && (
-              <select name="stream" value={form.stream} onChange={handleChange} className="w-full border p-2 rounded">
-                <option value="">Select Stream</option>
-                <option value="Biology">Biology</option>
-                <option value="Maths">Maths</option>
-                <option value="Tech">Tech</option>
-                <option value="Art">Art</option>
-                <option value="Commerce">Commerce</option>
-              </select>
+          <div className="overflow-x-auto">
+            {payments.length > 0 && (
+              <p className="text-gray-700 mb-4">
+                Monthly Fee:{" "}
+                <span className="font-semibold text-indigo-600">
+                  Rs. {payments[0].amountDue}
+                </span>
+              </p>
             )}
-            <input type="text" name="year" value={form.year} onChange={handleChange} placeholder="Academic Year (e.g., 2025)" className="w-full border p-2 rounded" required />
-            <select name="duration" value={form.duration} onChange={handleChange} className="w-full border p-2 rounded">
-              <option value="6 month">6 Month</option>
-              <option value="1 year">1 Year</option>
-            </select>
-            <input type="text" value={form.startingMonth} readOnly className="w-full border p-2 rounded bg-gray-100 text-gray-600" />
-            {error && <div className="text-red-600 text-sm">{error}</div>}
-            <button type="submit" className="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Submit Request</button>
-          </form>
+
+            <table className="w-full table-auto text-sm border">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-2 border">Month</th>
+                  <th className="p-2 border">Amount Due</th>
+                  <th className="p-2 border">Amount Paid</th>
+                  <th className="p-2 border">Remaining</th>
+                  <th className="p-2 border">Status</th>
+                  <th className="p-2 border">Paid On</th>
+                  <th className="p-2 border">Transaction ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((p) => (
+                 <tr key={p.id} className="border-t">
+  <td className="p-2 border">
+    {p.month} ({formatMonthName(p.month)})
+  </td>
+
+  <td className="p-2 border">{formatRs(p.amountDue)}</td>
+
+  <td className="p-2 border">
+    <input
+      type="number"
+      value={p.amountPaid}
+      step={1000}
+      onChange={(e) =>
+        handleChange(p.id, "amountPaid", e.target.value)
+      }
+      className="border px-2 py-1 w-24 rounded"
+    />
+  </td>
+
+<td className="p-2 border">{formatRs(p.remainingAmount)}</td>
+
+
+  <td className="p-2 border">
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+        p.amountPaid >= p.amountDue
+          ? "bg-green-100 text-green-800"
+          : p.amountPaid > 0
+          ? "bg-yellow-100 text-yellow-800"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {p.amountPaid >= p.amountDue
+        ? "Paid"
+        : p.amountPaid > 0
+        ? "Incomplete"
+        : "Unpaid"}
+    </span>
+  </td>
+
+  <td>
+    <input
+      type="date"
+      value={p.paidOn || ""}
+      onChange={(e) =>
+        handleChange(p.id, "paidOn", e.target.value)
+      }
+      className="border px-2 py-1 rounded"
+    />
+  </td>
+
+  <td className="p-2 border">
+    <input
+      type="text"
+      value={p.transactionId || ""}
+      onChange={(e) =>
+        handleChange(p.id, "transactionId", e.target.value)
+      }
+      className="border px-2 py-1 rounded"
+    />
+  </td>
+</tr>
+
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
-        <button onClick={onClose} className="mt-4 w-full text-center text-sm text-red-700 hover:underline">
-          Close
-        </button>
+        <div className="mt-4 text-right">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
+          >
+            <FaSave />
+            {isSaving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </div>
     </div>
   );
