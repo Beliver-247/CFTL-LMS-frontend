@@ -45,7 +45,7 @@ export default function Navbar() {
     admin: [
       { path: '/admin-dashboard', name: 'Dashboard', icon: <FaUser className="mr-1" /> },
       { path: '/admin/manage-courses', name: 'Manage Courses' },
-      { path: '/admin/subjects/create', name: 'Create Subject' },
+      { path: '/admin/manage-subjects', name: 'Manage Subjects' },
       { path: '/admin/courses/create', name: 'Create Course' },
       { path: '/admin/set-role', name: 'Set Roles' }
     ],

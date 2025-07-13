@@ -2,13 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
-import { getFreshToken } from "../../utils/authToken"; // Adjust the import path as necessary
+import { getFreshToken } from "../../utils/authToken";
+import { motion } from "framer-motion";
 import {
-  FaUser,
-  FaEnvelope,
-  FaSignOutAlt,
-  FaEdit,
-  FaTrash,
   FaUsers,
   FaChalkboardTeacher,
   FaBookOpen,
@@ -45,26 +41,6 @@ export default function AdminDashboard() {
     fetchAdmin();
   }, [navigate]);
 
-  const handleDelete = async () => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete your profile?"
-    );
-    if (!confirm) return;
-
-    try {
-      const token = await getFreshToken();
-      await axios.delete(`${baseURL}/api/admins/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      await auth.signOut(); // ✅ sign out from Firebase
-      localStorage.removeItem("adminToken");
-      window.location.href = "/admin-login"; // ✅ hard reload
-    } catch (err) {
-      alert("Failed to delete profile.");
-    }
-  };
-
   if (error)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -77,139 +53,85 @@ export default function AdminDashboard() {
   if (!admin)
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-700"></div>
       </div>
     );
 
+  const cards = [
+    {
+      title: "Manage Students",
+      icon: <FaUsers className="text-red-700 text-2xl" />,
+      description: "Add, update or remove students",
+      onClick: () => navigate("/admin/manage-students"),
+    },
+    {
+      title: "Manage Teachers",
+      icon: <FaChalkboardTeacher className="text-red-700 text-2xl" />,
+      description: "Assign subjects or edit teacher info",
+      onClick: () => alert("Manage Teachers"),
+    },
+    {
+      title: "Manage Syllabus",
+      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      description: "Edit curriculum and course content",
+      onClick: () => alert("Manage Syllabus"),
+    },
+    {
+      title: "Manage Courses",
+      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      description: "Create, edit, or delete courses",
+      onClick: () => navigate("/admin/manage-courses"),
+    },
+    {
+      title: "Manage Subjects",
+      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      description: "Add, edit, or remove subjects",
+      onClick: () => navigate("/admin/manage-subjects"),
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-blue-700 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center space-x-2">
-            <FaUser className="text-3xl" />
-            <span>Admin Dashboard</span>
-          </h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-900 bg-opacity-90 text-white px-4 py-10">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 text-center"
+        >
+          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+          <div className="flex justify-end mt-4">
+  <button
+    onClick={() => navigate("/student-register")}
+    className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+  >
+    Register Student
+  </button>
+</div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 p-6 flex flex-col md:flex-row items-center">
-          <img
-            src={admin.profilePictureUrl || "/default-profile.png"}
-            alt="Admin"
-            className="w-32 h-32 rounded-full object-cover mb-4 md:mb-0 md:mr-6"
-          />
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold mb-2">{admin.fullName}</h2>
-            <p className="text-gray-600 flex items-center">
-              <FaEnvelope className="mr-2" /> {admin.email}
-            </p>
-          </div>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <button
-              onClick={() => navigate("/admin-complete-profile")}
-              className="flex items-center space-x-1 bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded"
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {cards.map((card, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+              onClick={card.onClick}
+              className="bg-white text-gray-800 rounded-3xl shadow-xl p-6 cursor-pointer hover:shadow-2xl transition-shadow"
             >
-              <FaEdit />
-              <span>Edit</span>
-            </button>
-            <button
-              onClick={handleDelete}
-              className="flex items-center space-x-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-            >
-              <FaTrash />
-              <span>Delete</span>
-            </button>
-          </div>
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-red-100 p-3 rounded-full">
+                  {card.icon}
+                </div>
+                <h2 className="text-xl font-bold text-red-700">{card.title}</h2>
+              </div>
+              <p className="text-sm text-gray-700">{card.description}</p>
+            </motion.div>
+          ))}
         </div>
-
-        {/* Dashboard Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Manage Students */}
-          <div
-            onClick={() => navigate("/admin/manage-students")}
-
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <FaUsers className="text-blue-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Students</h3>
-              <p className="text-gray-500 text-sm">
-                Add, update or remove students
-              </p>
-            </div>
-          </div>
-
-          {/* Manage Teachers */}
-          <div
-            onClick={() => alert("Manage Teachers")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              <FaChalkboardTeacher className="text-green-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Teachers</h3>
-              <p className="text-gray-500 text-sm">
-                Assign subjects or edit teacher info
-              </p>
-            </div>
-          </div>
-
-          {/* Manage Syllabus */}
-          <div
-            onClick={() => alert("Manage Syllabus")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-purple-100 p-3 rounded-full mr-4">
-              <FaBookOpen className="text-purple-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Syllabus</h3>
-              <p className="text-gray-500 text-sm">
-                Edit curriculum and course content
-              </p>
-            </div>
-          </div>
-
-          {/* Manage Courses */}
-          <div
-            onClick={() => navigate("/admin/manage-courses")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-indigo-100 p-3 rounded-full mr-4">
-              <FaBookOpen className="text-indigo-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Courses</h3>
-              <p className="text-gray-500 text-sm">
-                Create, edit, or delete courses
-              </p>
-            </div>
-          </div>
-
-          {/* ✅ Manage Subjects */}
-          <div
-            onClick={() => navigate("/admin/manage-subjects")}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer p-6 flex items-center"
-          >
-            <div className="bg-orange-100 p-3 rounded-full mr-4">
-              <FaBookOpen className="text-orange-600 text-xl" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Manage Subjects</h3>
-              <p className="text-gray-500 text-sm">
-                Add, edit, or remove subjects
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
