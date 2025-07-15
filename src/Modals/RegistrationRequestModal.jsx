@@ -16,7 +16,7 @@ export default function RegistrationRequestModal({ onClose }) {
     startingMonth: ''
   });
 
-  const [months, setMonths] = useState([]);
+  const [months, setMonths] = useState({});
   const [streamsVisible, setStreamsVisible] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -31,19 +31,32 @@ export default function RegistrationRequestModal({ onClose }) {
   useEffect(() => {
     axios.get(`${baseURL}/api/registration-requests/starting-months`)
       .then(res => {
-        setMonths(res.data.months);
-        setForm(f => ({ ...f, startingMonth: res.data.months[0] }));
+        setMonths(res.data);
+
+        // Set initial default startingMonth based on current program/duration
+        const key = `${form.program}_${form.duration.replace(' ', '')}`;
+        const defaultMonth = res.data[key]?.[0] || '';
+        setForm(f => ({ ...f, startingMonth: defaultMonth }));
       })
-      .catch(() => setMonths([]));
+      .catch(() => setMonths({}));
   }, [baseURL]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const updatedForm = { ...form, [name]: value };
 
     if (name === 'program') {
+      updatedForm.stream = '';
       setStreamsVisible(value === 'AL');
     }
+
+    if (name === 'program' || name === 'duration') {
+      const newKey = `${updatedForm.program}_${updatedForm.duration.replace(' ', '')}`;
+      const defaultMonth = months[newKey]?.[0] || '';
+      updatedForm.startingMonth = defaultMonth;
+    }
+
+    setForm(updatedForm);
   };
 
   const validate = () => {
@@ -51,6 +64,7 @@ export default function RegistrationRequestModal({ onClose }) {
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return 'Invalid email address.';
     if (!/^\d{3}\s?\d{7}$/.test(form.phone)) return 'Phone number must be 10 digits (e.g., 071 1234567)';
     if (form.program === 'AL' && !form.stream) return 'Stream is required for AL program.';
+    if (!form.startingMonth) return 'Please select a starting month.';
     return null;
   };
 
@@ -70,23 +84,20 @@ export default function RegistrationRequestModal({ onClose }) {
     }
   };
 
-const setupRecaptcha = () => {
-  if (!window.recaptchaVerifier) {
-    const container = document.getElementById('recaptcha-container');
-    if (!container) {
-      setError('reCAPTCHA container not found');
-      return;
+  const setupRecaptcha = () => {
+    if (!window.recaptchaVerifier) {
+      const container = document.getElementById('recaptcha-container');
+      if (!container) {
+        setError('reCAPTCHA container not found');
+        return;
+      }
+
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {}
+      });
     }
-
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      size: 'invisible',
-      callback: () => {
-        // This auto-triggers sendOtp on verify
-      },
-    });
-  }
-};
-
+  };
 
   const sendOtp = async () => {
     setError('');
@@ -99,7 +110,7 @@ const setupRecaptcha = () => {
     try {
       setupRecaptcha();
       const appVerifier = window.recaptchaVerifier;
-      const fullNumber = '+94' + cleanedPhone.slice(1); // Convert 071xxxxxxx to +9471xxxxxxx
+      const fullNumber = '+94' + cleanedPhone.slice(1);
 
       const result = await signInWithPhoneNumber(auth, fullNumber, appVerifier);
       setConfirmationResult(result);
@@ -118,6 +129,9 @@ const setupRecaptcha = () => {
       setError('Invalid OTP. Please try again.');
     }
   };
+
+  const categoryKey = `${form.program}_${form.duration.replace(' ', '')}`;
+  const availableMonths = months[categoryKey] || [];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -190,7 +204,18 @@ const setupRecaptcha = () => {
               <option value="1 year">1 Year</option>
             </select>
 
-            <input type="text" value={form.startingMonth} readOnly className="w-full border p-2 rounded bg-gray-100 text-gray-600" />
+            <select
+              name="startingMonth"
+              value={form.startingMonth}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+              required
+            >
+              <option value="">Select Starting Month</option>
+              {availableMonths.map((m, i) => (
+                <option key={i} value={m}>{m}</option>
+              ))}
+            </select>
 
             {error && <div className="text-red-600 text-sm">{error}</div>}
 

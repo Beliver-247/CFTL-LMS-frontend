@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLogin from "./pages/AdminPages/AdminLogin";
 import AdminCompleteProfile from "./pages/AdminPages/AdminProfileForm";
 import AdminDashboard from "./pages/AdminPages/AdminDashboard";
+import AdminPaymentRequests from "./pages/AdminPages/AdminPaymentRequests";
 import CoordinatorDashboard from "./pages/CoordinatorPages/CoordinatorDashboard";
 import ManageCourses from "./pages/CoursePages/ManageCourses";
 import CreateCourse from "./pages/CoursePages/CreateCourse";
@@ -33,6 +34,7 @@ import PaymentStatusMy from "./pages/ParentPages/PaymentStatusMy";
 import ManagePaymentRequests from "./pages/CoordinatorPages/ManagePaymentRequests";
 import ViewPaymentStatus from "./pages/ParentPages/ViewPaymentStatus";
 import UserLogin from "./pages/UserLogin";
+import ViewRegistrationRequests from "./pages/AdminPages/ViewRegistrationRequests"
 
 export default function App() {
   return (
@@ -100,6 +102,13 @@ export default function App() {
               </RedirectIfAuthenticated>
             }
           />
+
+          <Route
+  path="/admin/payment-requests"
+  element={
+    <ProtectedRoute element={AdminPaymentRequests} allowedRoles={["admin"]} />
+  }
+/>
 
           <Route
             path="/admin-complete-profile"
@@ -170,6 +179,16 @@ export default function App() {
               />
             }
           />
+          <Route
+  path="/admin/registration-requests"
+  element={
+    <ProtectedRoute
+      element={ViewRegistrationRequests}
+      allowedRoles={["admin"]}
+    />
+  }
+/>
+
           <Route
             path="/coordinator/courses/:courseId/enroll"
             element={
