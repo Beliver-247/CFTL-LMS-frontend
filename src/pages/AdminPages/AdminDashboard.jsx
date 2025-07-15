@@ -4,16 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
 import { getFreshToken } from "../../utils/authToken";
 import { motion } from "framer-motion";
-import {
-  FaUsers,
-  FaChalkboardTeacher,
-  FaBookOpen,
-} from "react-icons/fa";
+import { FaUsers, FaChalkboardTeacher, FaBookOpen } from "react-icons/fa";
+import UpdateStartingMonthModal from "../../Modals/UpdateStartingMonthModal";
 
 export default function AdminDashboard() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const [admin, setAdmin] = useState(null);
   const [error, setError] = useState("");
+  const [showMonthsModal, setShowMonthsModal] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,15 +99,20 @@ export default function AdminDashboard() {
           className="mb-12 text-center"
         >
           <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <div className="flex justify-end mt-4">
-  <button
-    onClick={() => navigate("/student-register")}
-    className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
-  >
-    Register Student
-  </button>
-</div>
-
+          <div className="flex justify-end mt-4 space-x-4">
+            <button
+              onClick={() => setShowMonthsModal(true)}
+              className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
+            >
+              Update Starting Months
+            </button>
+            <button
+              onClick={() => navigate("/student-register")}
+              className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+            >
+              Register Student
+            </button>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -122,9 +126,7 @@ export default function AdminDashboard() {
               className="bg-white text-gray-800 rounded-3xl shadow-xl p-6 cursor-pointer hover:shadow-2xl transition-shadow"
             >
               <div className="flex items-center space-x-4 mb-4">
-                <div className="bg-red-100 p-3 rounded-full">
-                  {card.icon}
-                </div>
+                <div className="bg-red-100 p-3 rounded-full">{card.icon}</div>
                 <h2 className="text-xl font-bold text-red-700">{card.title}</h2>
               </div>
               <p className="text-sm text-gray-700">{card.description}</p>
@@ -132,6 +134,9 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
+      {showMonthsModal && <UpdateStartingMonthModal onClose={() => setShowMonthsModal(false)} />}
+
     </div>
+    
   );
 }
