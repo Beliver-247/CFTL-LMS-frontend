@@ -25,6 +25,7 @@ export default function RegistrationRequestModal({ onClose }) {
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [otpVerified, setOtpVerified] = useState(false);
+  const [otpCooldown, setOtpCooldown] = useState(false);
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -84,20 +85,23 @@ export default function RegistrationRequestModal({ onClose }) {
     }
   };
 
-  const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      const container = document.getElementById('recaptcha-container');
-      if (!container) {
-        setError('reCAPTCHA container not found');
-        return;
-      }
+const setupRecaptcha = () => {
+  if (window.recaptchaVerifier) {
+    window.recaptchaVerifier.clear(); // Clears previous instance
+  }
 
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: () => {}
-      });
-    }
-  };
+  const container = document.getElementById('recaptcha-container');
+  if (!container) {
+    setError('reCAPTCHA container not found');
+    return;
+  }
+
+  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    size: 'invisible',
+    callback: () => {}
+  });
+};
+
 
   const sendOtp = async () => {
     setError('');
@@ -115,6 +119,8 @@ export default function RegistrationRequestModal({ onClose }) {
       const result = await signInWithPhoneNumber(auth, fullNumber, appVerifier);
       setConfirmationResult(result);
       setOtpSent(true);
+      setOtpCooldown(true);
+setTimeout(() => setOtpCooldown(false), 60000); // 1 min cooldown
     } catch (err) {
       setError('Failed to send OTP. Try again.');
       console.error(err);
@@ -161,9 +167,15 @@ export default function RegistrationRequestModal({ onClose }) {
             />
 
             <div className="flex gap-2 items-center">
-              <button type="button" onClick={sendOtp} className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                Send Code
-              </button>
+<button
+  type="button"
+  onClick={sendOtp}
+  disabled={otpCooldown}
+  className={`px-3 py-1 rounded text-white ${otpCooldown ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+>
+  {otpCooldown ? 'Please wait...' : 'Send Code'}
+</button>
+
               {otpSent && !otpVerified && (
                 <>
                   <input
