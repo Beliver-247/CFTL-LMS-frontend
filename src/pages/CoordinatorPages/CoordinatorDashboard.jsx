@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
+import { motion } from "framer-motion";
 import {
   FaBook,
   FaClock,
@@ -50,72 +51,96 @@ export default function CoordinatorDashboard() {
     navigate(`/coordinator/courses/${courseId}/students`);
   };
 
-  // Show spinner while loading
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin h-12 w-12 border-t-4 border-b-4 border-indigo-600 rounded-full" />
+      <div className="flex justify-center items-center h-screen bg-gray-900">
+        <div className="animate-spin h-12 w-12 border-t-4 border-b-4 border-white rounded-full" />
       </div>
     );
   }
 
-  if (error) return <div className="text-red-600 p-4">{error}</div>;
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-indigo-700 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center space-x-2">
+    <div className="min-h-screen bg-gray-900 text-white px-4 py-10">
+      <div className="max-w-7xl mx-auto">
+        {/* HEADER */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 text-center"
+        >
+          <h1 className="text-4xl font-bold mb-2 flex justify-center items-center gap-2">
             <FaUserTie className="text-3xl" />
             <span>Coordinator Dashboard</span>
           </h1>
-        </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="p-6">
-        <button
-          onClick={() => navigate("/coordinator/enrolled-students")}
-          className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition"
-        >
-          View Enrolled Students
-        </button>
+          <div className="flex justify-end mt-6 flex-wrap gap-4">
+            <button
+              onClick={() => navigate("/coordinator/enrolled-students")}
+              className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition"
+            >
+              View Enrolled Students
+            </button>
+            <button
+              onClick={() => navigate("/coordinator/manage-payment-requests")}
+              className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
+            >
+              Manage Payment Requests
+            </button>
+            <button
+              onClick={() => navigate("/student-register")}
+              className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+            >
+              Register Student
+            </button>
+          </div>
+        </motion.div>
 
-        <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2">
-          <FaBook />
+        {/* COURSES SECTION */}
+        <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+          <FaBook className="text-red-500" />
           <span>Your Assigned Courses</span>
         </h2>
 
         {courses.length === 0 ? (
-          <p>No courses assigned to you yet.</p>
+          <p className="text-gray-300">No courses assigned to you yet.</p>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course) => (
-              <div
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map((course, index) => (
+              <motion.div
                 key={course.id}
-                className="p-5 bg-white shadow rounded-lg cursor-pointer hover:bg-indigo-50 transition"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
                 onClick={() => handleCourseClick(course.id)}
+                className="bg-white text-gray-800 rounded-3xl shadow-xl p-6 cursor-pointer hover:shadow-2xl transition-shadow"
               >
-                <h3 className="text-lg font-semibold mb-1">{course.name}</h3>
-                <p className="text-sm text-gray-600 mb-1">
-                  Program: {course.program}{" "}
-                  {course.stream ? `- ${course.stream}` : ""}
+                <h3 className="text-xl font-bold text-indigo-700 mb-2">{course.name}</h3>
+                <p className="text-sm text-gray-700 mb-1">
+                  Program: {course.program} {course.stream && `- ${course.stream}`}
                 </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  Year: {course.year}
-                </p>
-                <p className="text-sm text-gray-600 mb-1 flex items-center">
+                <p className="text-sm text-gray-700 mb-1">Year: {course.year}</p>
+                <p className="text-sm text-gray-700 mb-1 flex items-center">
                   <FaClock className="mr-1" /> Duration: {course.duration}
                 </p>
-                <p className="text-sm text-gray-600 flex items-center">
+                <p className="text-sm text-gray-700 flex items-center">
                   <FaUserGraduate className="mr-1" /> Total Fee: Rs. {course.totalFee}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
