@@ -7,6 +7,7 @@ import {
   FaEye,
   FaTimes,
 } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 export default function ManagePaymentRequests() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -34,6 +35,7 @@ export default function ManagePaymentRequests() {
         }
       );
       setRequests(res.data || []);
+      setError("");
     } catch (err) {
       setError(
         err.response?.data?.error || "Failed to fetch payment requests."
@@ -55,7 +57,7 @@ export default function ManagePaymentRequests() {
         }
       );
       setSuccess("Payment request approved successfully!");
-      fetchRequests(); // refresh
+      fetchRequests();
     } catch (err) {
       setError(err.response?.data?.error || "Approval failed.");
     } finally {
@@ -64,12 +66,12 @@ export default function ManagePaymentRequests() {
   };
 
   const rejectRequest = async () => {
-    try {
-      if (!rejectionReason.trim()) {
-        setError("Rejection reason is required.");
-        return;
-      }
+    if (!rejectionReason.trim()) {
+      setError("Rejection reason is required.");
+      return;
+    }
 
+    try {
       setLoading(true);
       const token = localStorage.getItem("adminToken");
       await axios.put(
@@ -95,13 +97,11 @@ export default function ManagePaymentRequests() {
       const filePath = decodeURIComponent(
         new URL(receiptUrl).pathname.split("/o/")[1].split("?")[0]
       );
-
       const res = await axios.post(
         `${baseURL}/api/uploads/view-url`,
         { filePath },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       window.open(res.data.signedUrl, "_blank");
     } catch (err) {
       console.error(err);
@@ -125,103 +125,125 @@ export default function ManagePaymentRequests() {
   const renderStatus = (status) => {
     switch (status) {
       case "approved":
-        return <FaCheckCircle className="text-green-600 mr-1" />;
+        return <FaCheckCircle className="text-green-500 mr-1" />;
       case "pending":
-        return <FaClock className="text-yellow-600 mr-1" />;
+        return <FaClock className="text-yellow-500 mr-1" />;
       case "rejected":
-        return <FaTimesCircle className="text-red-600 mr-1" />;
+        return <FaTimesCircle className="text-red-500 mr-1" />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Manage Payment Requests</h1>
+    <div className="min-h-screen bg-gray-900 text-white px-6 py-10">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold mb-6 text-center">
+            Manage Payment Requests
+          </h1>
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-      )}
-      {success && (
-        <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
-          {success}
-        </div>
-      )}
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : requests.length === 0 ? (
-        <p className="text-gray-600">No payment requests available.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {requests.map((req) => (
-            <div
-              key={req.id}
-              className="bg-white rounded-lg shadow-md p-5 relative"
-            >
-              <div className="flex items-center mb-2">
-                {renderStatus(req.status)}
-                <h2 className="text-lg font-semibold ml-1">
-                  {req.status.toUpperCase()}
-                </h2>
-              </div>
-              <p>
-                <strong>Student:</strong> {req.studentName}
-              </p>
-              <p>
-                <strong>Course:</strong> {req.courseName}
-              </p>
-              <p>
-                <strong>Month:</strong> {req.month}
-              </p>
-              <p>
-                <strong>Amount:</strong> Rs. {req.amountRequested}
-              </p>
-              <p>
-                <strong>Requested On:</strong>{" "}
-                {new Date(req.requestedOn?.seconds * 1000).toLocaleDateString()}
-              </p>
-              {req.status === "approved" && (
-                <p>
-                  <strong>Approved By:</strong> {req.approvedBy}
-                </p>
-              )}
-              {req.status === "rejected" && (
-                <p className="text-red-600 italic">
-                  <strong>Reason:</strong> {req.rejectionReason || "Not provided"}
-                </p>
-              )}
-              <button
-                onClick={() => handleViewReceipt(req.receiptUrl)}
-                className="text-blue-600 hover:underline block mt-2 flex items-center"
-              >
-                <FaEye className="mr-1" /> View Receipt
-              </button>
-
-              {req.status === "pending" && (
-                <div className="mt-4 flex gap-2">
-                  <button
-                    onClick={() => approveRequest(req.id)}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => openRejectModal(req.id)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
+          {error && (
+            <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+              {error}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+          {success && (
+            <div className="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
+              {success}
+            </div>
+          )}
 
+          {loading ? (
+            <div className="flex justify-center items-center h-40">
+              <div className="animate-spin h-10 w-10 border-t-4 border-b-4 border-white rounded-full" />
+            </div>
+          ) : requests.length === 0 ? (
+            <p className="text-gray-300 text-center">
+              No payment requests available.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {requests.map((req) => (
+                <motion.div
+                  key={req.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="bg-white text-gray-800 rounded-2xl shadow-xl p-6 relative"
+                >
+                  <div className="flex items-center mb-2">
+                    {renderStatus(req.status)}
+                    <h2 className="text-lg font-semibold ml-2 uppercase">
+                      {req.status}
+                    </h2>
+                  </div>
+                  <p>
+                    <strong>Student:</strong> {req.studentName}
+                  </p>
+                  <p>
+                    <strong>Course:</strong> {req.courseName}
+                  </p>
+                  <p>
+                    <strong>Month:</strong> {req.month}
+                  </p>
+                  <p>
+                    <strong>Amount:</strong> Rs. {req.amountRequested}
+                  </p>
+                  <p>
+                    <strong>Requested On:</strong>{" "}
+                    {new Date(req.requestedOn?.seconds * 1000).toLocaleDateString()}
+                  </p>
+
+                  {req.status === "approved" && (
+                    <p>
+                      <strong>Approved By:</strong> {req.approvedBy}
+                    </p>
+                  )}
+                  {req.status === "rejected" && (
+                    <p className="text-red-600 italic mt-1">
+                      <strong>Reason:</strong> {req.rejectionReason || "Not provided"}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => handleViewReceipt(req.receiptUrl)}
+                    className="text-blue-600 hover:underline mt-2 flex items-center"
+                  >
+                    <FaEye className="mr-1" /> View Receipt
+                  </button>
+
+                  {req.status === "pending" && (
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => approveRequest(req.id)}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => openRejectModal(req.id)}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white text-gray-800 p-6 rounded-xl w-full max-w-md relative shadow-xl">
             <button
               onClick={closeModal}
               className="absolute top-2 right-2 text-gray-500 hover:text-black"
@@ -235,6 +257,7 @@ export default function ManagePaymentRequests() {
               rows={4}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter reason..."
             ></textarea>
             <div className="flex justify-end mt-4">
               <button
