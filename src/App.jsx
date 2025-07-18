@@ -34,7 +34,9 @@ import PaymentStatusMy from "./pages/ParentPages/PaymentStatusMy";
 import ManagePaymentRequests from "./pages/CoordinatorPages/ManagePaymentRequests";
 import ViewPaymentStatus from "./pages/ParentPages/ViewPaymentStatus";
 import UserLogin from "./pages/UserLogin";
-import ViewRegistrationRequests from "./pages/AdminPages/ViewRegistrationRequests"
+import ViewRegistrationRequests from "./pages/AdminPages/ViewRegistrationRequests";
+import SyllabusCourseList from "./pages/AdminPages/syllabusCourseList";
+import ManageCourseSyllabus from "./pages/AdminPages/ManageCourseSyllabus";
 
 export default function App() {
   return (
@@ -83,6 +85,15 @@ export default function App() {
               <ProtectedRoute element={EditStudent} allowedRoles={["admin"]} />
             }
           />
+          <Route
+  path="/admin/syllabus-courses"
+  element={<ProtectedRoute element={SyllabusCourseList} allowedRoles={["admin"]} />}
+/>
+<Route
+  path="/admin/courses/:courseId/syllabus"
+  element={<ProtectedRoute element={ManageCourseSyllabus} allowedRoles={["admin"]} />}
+/>
+
 
           <Route
             path="/coordinator-login"
