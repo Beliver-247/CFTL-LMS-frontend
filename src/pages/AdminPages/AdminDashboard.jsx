@@ -69,12 +69,13 @@ export default function AdminDashboard() {
       description: "Assign subjects or edit teacher info",
       onClick: () => alert("Manage Teachers"),
     },
-    {
-      title: "Manage Syllabus",
-      icon: <FaBookOpen className="text-red-700 text-2xl" />,
-      description: "Edit curriculum and course content",
-      onClick: () => alert("Manage Syllabus"),
-    },
+{
+  title: "Manage Syllabus",
+  icon: <FaBookOpen className="text-red-700 text-2xl" />,
+  description: "Edit curriculum and course content",
+  onClick: () => navigate("/admin/syllabus-courses"),
+}
+,
     {
       title: "Manage Courses",
       icon: <FaBookOpen className="text-red-700 text-2xl" />,
