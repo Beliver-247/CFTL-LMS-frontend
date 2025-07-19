@@ -1,12 +1,12 @@
-// pages/TeacherPages/UpdateCourseStatus.jsx
+// pages/CoordinatorPages/CoordinatorSyllabusApproval.jsx
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-export default function UpdateCourseStatus() {
+export default function CoordinatorSyllabusApproval() {
   const { courseId } = useParams();
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('adminToken');
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [syllabus, setSyllabus] = useState(null);
   const [message, setMessage] = useState('');
@@ -32,36 +32,21 @@ export default function UpdateCourseStatus() {
     fetchSyllabus();
   }, [month]);
 
-  const markSubtopicComplete = async (weekNumber, topicIndex, subIndex) => {
-    if (!token) {
-      setMessage('You must be logged in to perform this action.');
-      return;
-    }
-
+  const approveChanges = async () => {
     try {
-      const res = await axios.patch(
-        `${baseURL}/api/syllabus/${syllabus.id}/weeks/${weekNumber}/topics/${topicIndex}/subtopics/${subIndex}`,
-        {},
-        
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-        
-      );
-      
+      const res = await axios.post(`${baseURL}/api/syllabus/${syllabus.id}/approval`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setMessage(res.data.message);
       fetchSyllabus();
     } catch (err) {
-      setMessage(err.response?.data?.error || 'Failed to mark subtopic complete.');
+      setMessage(err.response?.data?.error || 'Failed to approve changes.');
     }
   };
 
   return (
     <div className="min-h-screen bg-white p-6">
-      <h1 className="text-2xl font-bold mb-4">Update Teaching Status</h1>
+      <h1 className="text-2xl font-bold mb-4">Approve Syllabus Updates</h1>
 
       <div className="mb-4">
         <label className="font-semibold">Month:</label>
@@ -86,18 +71,13 @@ export default function UpdateCourseStatus() {
                   <ul className="ml-4 mt-2">
                     {topic.subtopics.map((sub, subIdx) => (
                       <li key={subIdx} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={sub.status === 'complete'}
-                          disabled={sub.status === 'complete' || sub.pendingApproval}
-                          onChange={() =>
-                            markSubtopicComplete(week.weekNumber, topicIdx, subIdx)
-                          }
-                        />
                         <span>
                           {sub.title}
                           {sub.pendingApproval && (
                             <span className="text-yellow-600 ml-2 text-sm">(Pending Approval)</span>
+                          )}
+                          {sub.approvedAt && (
+                            <span className="text-green-600 ml-2 text-sm">(Approved)</span>
                           )}
                         </span>
                       </li>
@@ -107,6 +87,15 @@ export default function UpdateCourseStatus() {
               ))}
             </div>
           ))}
+
+          <div className="text-center mt-6">
+            <button
+              onClick={approveChanges}
+              className="bg-green-700 text-white px-6 py-2 rounded hover:bg-green-800"
+            >
+              Approve All Pending Changes
+            </button>
+          </div>
         </div>
       ) : (
         <p>{message}</p>
