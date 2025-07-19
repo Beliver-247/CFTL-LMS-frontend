@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
 import { getFreshToken } from "../../utils/authToken";
 import { motion } from "framer-motion";
-import { FaUsers, FaChalkboardTeacher, FaBookOpen } from "react-icons/fa";
+import { FaUsers, FaChalkboardTeacher, FaBookOpen, FaClipboardList, FaMoneyCheckAlt } from "react-icons/fa";
 import UpdateStartingMonthModal from "../../Modals/UpdateStartingMonthModal";
 
 export default function AdminDashboard() {
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Manage Syllabus",
-      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      icon: <FaClipboardList className="text-red-700 text-2xl" />,
       description: "Edit curriculum and course content",
       onClick: () => navigate("/admin/syllabus-courses"),
     },
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
     },
     {
       title: "View Payment Requests",
-      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      icon: <FaMoneyCheckAlt className="text-red-700 text-2xl" />,
       description: "See all submitted payment requests",
       onClick: () => navigate("/admin/payment-requests"),
     },

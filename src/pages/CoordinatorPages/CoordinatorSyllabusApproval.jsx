@@ -44,6 +44,34 @@ export default function CoordinatorSyllabusApproval() {
     }
   };
 
+  const approveTopic = async (week, topicIdx) => {
+    try {
+      const res = await axios.patch(
+        `${baseURL}/api/syllabus/${syllabus.id}/weeks/${week}/topics/${topicIdx}/approve`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage(res.data.message);
+      fetchSyllabus();
+    } catch (err) {
+      setMessage(err.response?.data?.error || 'Failed to approve topic.');
+    }
+  };
+
+  const approveSubtopic = async (week, topicIdx, subIdx) => {
+    try {
+      const res = await axios.patch(
+        `${baseURL}/api/syllabus/${syllabus.id}/weeks/${week}/topics/${topicIdx}/subtopics/${subIdx}/approve`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage(res.data.message);
+      fetchSyllabus();
+    } catch (err) {
+      setMessage(err.response?.data?.error || 'Failed to approve subtopic.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white p-6">
       <h1 className="text-2xl font-bold mb-4">Approve Syllabus Updates</h1>
@@ -66,11 +94,21 @@ export default function CoordinatorSyllabusApproval() {
             <div key={weekIdx} className="border rounded p-4">
               <h2 className="text-lg font-bold mb-2">Week {week.weekNumber}</h2>
               {week.topics.map((topic, topicIdx) => (
-                <div key={topicIdx} className="ml-4">
-                  <h3 className="font-semibold">Topic: {topic.title}</h3>
+                <div key={topicIdx} className="ml-4 mb-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold">Topic: {topic.title}</h3>
+                    {topic.pendingApproval && (
+                      <button
+                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                        onClick={() => approveTopic(week.weekNumber, topicIdx)}
+                      >
+                        Approve Topic
+                      </button>
+                    )}
+                  </div>
                   <ul className="ml-4 mt-2">
                     {topic.subtopics.map((sub, subIdx) => (
-                      <li key={subIdx} className="flex items-center gap-2">
+                      <li key={subIdx} className="flex items-center gap-2 justify-between">
                         <span>
                           {sub.title}
                           {sub.pendingApproval && (
@@ -80,6 +118,14 @@ export default function CoordinatorSyllabusApproval() {
                             <span className="text-green-600 ml-2 text-sm">(Approved)</span>
                           )}
                         </span>
+                        {sub.pendingApproval && (
+                          <button
+                            className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                            onClick={() => approveSubtopic(week.weekNumber, topicIdx, subIdx)}
+                          >
+                            Approve
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>
