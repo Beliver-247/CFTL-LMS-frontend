@@ -49,19 +49,19 @@ export default function UserLogin() {
           to="/parent-login"
           className="w-2/3 text-center px-6 py-3 bg-red-700 text-white rounded-md text-lg font-semibold hover:bg-red-600"
         >
-          LOGIN AS A PARENT
+          PARENT
         </Link>
         <Link
           to="/teacher-login"
           className="w-2/3 text-center px-6 py-3 bg-red-700 text-white rounded-md text-lg font-semibold hover:bg-red-600"
         >
-          LOGIN AS A TEACHER
+          TEACHER
         </Link>
         <Link
           to="/coordinator-login"
           className="w-2/3 text-center px-6 py-3 bg-red-700 text-white rounded-md text-lg font-semibold hover:bg-red-600"
         >
-          LOGIN AS A COORDINATOR
+          COORDINATOR 
         </Link>
       </motion.div>
     </div>

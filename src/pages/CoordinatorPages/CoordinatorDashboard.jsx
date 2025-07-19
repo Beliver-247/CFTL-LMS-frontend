@@ -116,28 +116,46 @@ export default function CoordinatorDashboard() {
           <p className="text-gray-300">No courses assigned to you yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course, index) => (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onClick={() => handleCourseClick(course.id)}
-                className="bg-white text-gray-800 rounded-3xl shadow-xl p-6 cursor-pointer hover:shadow-2xl transition-shadow"
-              >
-                <h3 className="text-xl font-bold text-indigo-700 mb-2">{course.name}</h3>
-                <p className="text-sm text-gray-700 mb-1">
-                  Program: {course.program} {course.stream && `- ${course.stream}`}
-                </p>
-                <p className="text-sm text-gray-700 mb-1">Year: {course.year}</p>
-                <p className="text-sm text-gray-700 mb-1 flex items-center">
-                  <FaClock className="mr-1" /> Duration: {course.duration}
-                </p>
-                <p className="text-sm text-gray-700 flex items-center">
-                  <FaUserGraduate className="mr-1" /> Total Fee: Rs. {course.totalFee}
-                </p>
-              </motion.div>
-            ))}
+{courses.map((course, index) => (
+  <motion.div
+    key={course.id}
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: index * 0.1 }}
+    className="bg-white text-gray-800 rounded-3xl shadow-xl p-6 hover:shadow-2xl transition-shadow"
+  >
+    <h3 className="text-xl font-bold text-indigo-700 mb-2">{course.name}</h3>
+    <p className="text-sm text-gray-700 mb-1">
+      Program: {course.program} {course.stream && `- ${course.stream}`}
+    </p>
+    <p className="text-sm text-gray-700 mb-1">Year: {course.year}</p>
+    <p className="text-sm text-gray-700 mb-1 flex items-center">
+      <FaClock className="mr-1" /> Duration: {course.duration}
+    </p>
+    <p className="text-sm text-gray-700 flex items-center mb-4">
+      <FaUserGraduate className="mr-1" /> Total Fee: Rs. {course.totalFee}
+    </p>
+
+    {/* Buttons */}
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={() => handleCourseClick(course.id)}
+        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+      >
+        View Students
+      </button>
+      <button
+        onClick={() =>
+          navigate(`/coordinator/courses/${course.id}/approve-syllabus`)
+        }
+        className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition"
+      >
+        Syllabus Requests
+      </button>
+    </div>
+  </motion.div>
+))}
+
           </div>
         )}
       </div>

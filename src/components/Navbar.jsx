@@ -145,14 +145,24 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="-mr-2 flex md:hidden">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-red-200 hover:text-white hover:bg-red-700 focus:outline-none"
-            >
-              {isMobileMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
-            </button>
-          </div>
+<div className="-mr-2 flex md:hidden">
+  {userType === 'guest' ? (
+    <Link
+      to="/login"
+      className="px-4 py-2 bg-white text-red-700 rounded-md text-sm font-medium hover:bg-red-100"
+    >
+      Login
+    </Link>
+  ) : (
+    <button
+      onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      className="inline-flex items-center justify-center p-2 rounded-md text-red-200 hover:text-white hover:bg-red-700 focus:outline-none"
+    >
+      {isMobileMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
+    </button>
+  )}
+</div>
+
         </div>
       </div>
 
