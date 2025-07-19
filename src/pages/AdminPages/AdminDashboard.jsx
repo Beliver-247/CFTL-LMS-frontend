@@ -69,13 +69,12 @@ export default function AdminDashboard() {
       description: "Assign subjects or edit teacher info",
       onClick: () => alert("Manage Teachers"),
     },
-{
-  title: "Manage Syllabus",
-  icon: <FaBookOpen className="text-red-700 text-2xl" />,
-  description: "Edit curriculum and course content",
-  onClick: () => navigate("/admin/syllabus-courses"),
-}
-,
+    {
+      title: "Manage Syllabus",
+      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      description: "Edit curriculum and course content",
+      onClick: () => navigate("/admin/syllabus-courses"),
+    },
     {
       title: "Manage Courses",
       icon: <FaBookOpen className="text-red-700 text-2xl" />,
@@ -83,18 +82,23 @@ export default function AdminDashboard() {
       onClick: () => navigate("/admin/manage-courses"),
     },
     {
+  title: "Assign Teachers to Courses",
+  icon: <FaChalkboardTeacher className="text-red-700 text-2xl" />,
+  description: "Assign courses to teachers",
+  onClick: () => navigate("/admin/assign-courses-to-teacher"),
+},
+    {
       title: "Manage Subjects",
       icon: <FaBookOpen className="text-red-700 text-2xl" />,
       description: "Add, edit, or remove subjects",
       onClick: () => navigate("/admin/manage-subjects"),
     },
     {
-  title: "View Payment Requests",
-  icon: <FaBookOpen className="text-red-700 text-2xl" />,
-  description: "See all submitted payment requests",
-  onClick: () => navigate("/admin/payment-requests"),
-},
-
+      title: "View Payment Requests",
+      icon: <FaBookOpen className="text-red-700 text-2xl" />,
+      description: "See all submitted payment requests",
+      onClick: () => navigate("/admin/payment-requests"),
+    },
   ];
 
   return (
@@ -107,29 +111,28 @@ export default function AdminDashboard() {
           className="mb-12 text-center"
         >
           <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-<div className="flex justify-end mt-4 space-x-4">
-  <button
-    onClick={() => navigate("/admin/registration-requests")}
-    className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition"
-  >
-    View Registration Requests
-  </button>
+          <div className="flex justify-end mt-4 space-x-4">
+            <button
+              onClick={() => navigate("/admin/registration-requests")}
+              className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition"
+            >
+              View Registration Requests
+            </button>
 
-  <button
-    onClick={() => setShowMonthsModal(true)}
-    className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
-  >
-    Update Starting Months
-  </button>
+            <button
+              onClick={() => setShowMonthsModal(true)}
+              className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
+            >
+              Update Starting Months
+            </button>
 
-  <button
-    onClick={() => navigate("/student-register")}
-    className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
-  >
-    Register Student
-  </button>
-</div>
-
+            <button
+              onClick={() => navigate("/student-register")}
+              className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+            >
+              Register Student
+            </button>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -151,9 +154,9 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
-      {showMonthsModal && <UpdateStartingMonthModal onClose={() => setShowMonthsModal(false)} />}
-
+      {showMonthsModal && (
+        <UpdateStartingMonthModal onClose={() => setShowMonthsModal(false)} />
+      )}
     </div>
-    
   );
 }

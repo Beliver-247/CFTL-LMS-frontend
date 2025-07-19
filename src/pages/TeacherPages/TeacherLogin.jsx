@@ -19,23 +19,38 @@ export default function TeacherLogin() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+const handleEmailLogin = async (e) => {
+  e.preventDefault();
+  setError('');
+  setIsLoading(true);
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
-      localStorage.setItem('token', token);
-      localStorage.setItem('userRole', 'teacher');
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const token = await userCredential.user.getIdToken();
+    localStorage.setItem('token', token);
+    localStorage.setItem('userRole', 'teacher');
+
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teachers/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.status === 404) {
+      navigate('/teacher-complete-profile');
+    } else if (res.ok) {
       navigate('/teacher-dashboard');
-    } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
-    } finally {
-      setIsLoading(false);
+    } else {
+      const data = await res.json();
+      setError(data?.error || 'Unexpected error occurred');
     }
-  };
+  } catch (err) {
+    setError(err.message.replace('Firebase: ', ''));
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleGoogleLogin = async () => {
     setError('');

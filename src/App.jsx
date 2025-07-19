@@ -37,6 +37,9 @@ import UserLogin from "./pages/UserLogin";
 import ViewRegistrationRequests from "./pages/AdminPages/ViewRegistrationRequests";
 import SyllabusCourseList from "./pages/AdminPages/syllabusCourseList";
 import ManageCourseSyllabus from "./pages/AdminPages/ManageCourseSyllabus";
+import AssignCoursesToTeacher from "./pages/AdminPages/AssignCoursesToTeachers";
+import TeacherModules from "./pages/TeacherPages/TeacherModules";
+import UpdateCourseStatus from "./pages/TeacherPages/UpdateCourseStatus";
 
 export default function App() {
   return (
@@ -54,12 +57,16 @@ export default function App() {
             path="/teacher-complete-profile"
             element={<TeacherCompleteProfile />}
           />
-          <Route path="/parent-login" element={<ParentLogin />} />
+          <Route path="/teacher-modules" element={<TeacherModules />} />
+          <Route path="/teacher/courses/:courseId/update-status" element={<UpdateCourseStatus />} />
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/payment-status" element={<PaymentStatusMy />} />
           <Route path="/student-register" element={<StudentRegister />} />
-          <Route path="/view-payment-requests" element={<ViewPaymentStatus />} />
+          <Route
+            path="/view-payment-requests"
+            element={<ViewPaymentStatus />}
+          />
           <Route
             path="/admin/manage-students"
             element={
@@ -86,14 +93,32 @@ export default function App() {
             }
           />
           <Route
-  path="/admin/syllabus-courses"
-  element={<ProtectedRoute element={SyllabusCourseList} allowedRoles={["admin"]} />}
-/>
-<Route
-  path="/admin/courses/:courseId/syllabus"
-  element={<ProtectedRoute element={ManageCourseSyllabus} allowedRoles={["admin"]} />}
-/>
-
+            path="/admin/syllabus-courses"
+            element={
+              <ProtectedRoute
+                element={SyllabusCourseList}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
+          <Route
+            path="/admin/courses/:courseId/syllabus"
+            element={
+              <ProtectedRoute
+                element={ManageCourseSyllabus}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
+          <Route
+            path="/admin/assign-courses-to-teacher"
+            element={
+              <ProtectedRoute
+                element={AssignCoursesToTeacher}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
 
           <Route
             path="/coordinator-login"
@@ -115,11 +140,14 @@ export default function App() {
           />
 
           <Route
-  path="/admin/payment-requests"
-  element={
-    <ProtectedRoute element={AdminPaymentRequests} allowedRoles={["admin"]} />
-  }
-/>
+            path="/admin/payment-requests"
+            element={
+              <ProtectedRoute
+                element={AdminPaymentRequests}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
 
           <Route
             path="/admin-complete-profile"
@@ -191,14 +219,14 @@ export default function App() {
             }
           />
           <Route
-  path="/admin/registration-requests"
-  element={
-    <ProtectedRoute
-      element={ViewRegistrationRequests}
-      allowedRoles={["admin"]}
-    />
-  }
-/>
+            path="/admin/registration-requests"
+            element={
+              <ProtectedRoute
+                element={ViewRegistrationRequests}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
 
           <Route
             path="/coordinator/courses/:courseId/enroll"
