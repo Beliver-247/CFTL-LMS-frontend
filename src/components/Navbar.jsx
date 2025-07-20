@@ -34,7 +34,6 @@ export default function Navbar() {
     parent: [
       { path: '/parent-dashboard', name: 'Dashboard' },
       { path: '/view-payment-requests', name: 'View Payment Requests' },
-      { path: '/parent-profile', name: 'Profile', icon: <FaUser className="mr-1" /> }
     ],
     student: [
       { path: '/student-dashboard', name: 'Dashboard', icon: <FaGraduationCap className="mr-1" /> },
