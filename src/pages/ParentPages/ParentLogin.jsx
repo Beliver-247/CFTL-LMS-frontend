@@ -23,6 +23,7 @@ export default function ParentLogin() {
       const { token } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('userRole', 'parent');
+      localStorage.setItem('activeRole', 'parent');
       navigate('/parent-dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
