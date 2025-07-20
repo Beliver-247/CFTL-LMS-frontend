@@ -29,6 +29,7 @@ const handleEmailLogin = async (e) => {
     const token = await userCredential.user.getIdToken();
     localStorage.setItem('token', token);
     localStorage.setItem('userRole', 'teacher');
+    localStorage.setItem('activeRole', 'teacher');
 
     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teachers/profile`, {
       headers: {
@@ -63,6 +64,7 @@ const handleEmailLogin = async (e) => {
 
       localStorage.setItem('token', token);
       localStorage.setItem('userRole', 'teacher');
+      localStorage.setItem('activeRole', 'teacher');
 
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teachers/profile`, {
         headers: {
