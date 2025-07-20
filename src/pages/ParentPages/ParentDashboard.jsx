@@ -41,10 +41,6 @@ export default function ParentDashboard() {
     fetchStudents();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/parent-login');
-  };
 
   if (error) return (
     <div className="flex items-center justify-center h-screen">
@@ -56,15 +52,6 @@ export default function ParentDashboard() {
 
   if (!students.length) return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="flex justify-end">
-        <button
-          onClick={handleLogout}
-          className="flex items-center space-x-2 bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <FaSignOutAlt />
-          <span>Logout</span>
-        </button>
-      </div>
       <div className="bg-white text-gray-700 rounded-xl shadow-md p-6 mt-4 text-center">
         <p>No child records found.</p>
       </div>
