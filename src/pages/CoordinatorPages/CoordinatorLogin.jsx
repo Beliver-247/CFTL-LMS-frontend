@@ -51,6 +51,7 @@ export default function CoordinatorLogin() {
       const token = await userCred.user.getIdToken();
       localStorage.setItem('adminToken', token);
       localStorage.setItem('userRole', 'coordinator');
+      localStorage.setItem('activeRole', 'coordinator');
 
       const res = await axios.get(`${baseURL}/api/admins/me`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -81,6 +82,7 @@ export default function CoordinatorLogin() {
       const token = await result.user.getIdToken();
       localStorage.setItem('adminToken', token);
       localStorage.setItem('userRole', 'coordinator');
+      localStorage.setItem('activeRole', 'coordinator');
       const res = await axios.get(`${baseURL}/api/admins/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -103,6 +103,8 @@ export default function AdminLogin() {
 
       const token = await userCred.user.getIdToken();
       localStorage.setItem("adminToken", token);
+      localStorage.setItem("userRole", "admin");
+      localStorage.setItem("activeRole", "admin");
       await checkProfileAndNavigate(token);
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));
@@ -127,6 +129,7 @@ export default function AdminLogin() {
       const token = await result.user.getIdToken();
       localStorage.setItem("adminToken", token);
       localStorage.setItem("userRole", "admin");
+      localStorage.setItem("activeRole", "admin");
       await checkProfileAndNavigate(token);
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));

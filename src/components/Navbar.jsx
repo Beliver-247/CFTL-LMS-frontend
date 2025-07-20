@@ -19,7 +19,7 @@ export default function Navbar() {
   const path = location.pathname;
 
   useEffect(() => {
-    const role = localStorage.getItem('userRole') || 'guest';
+    const role = localStorage.getItem('activeRole') || 'guest';
     setUserType(role);
   }, [location]);
 
@@ -76,6 +76,7 @@ export default function Navbar() {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('activeRole');
 
     if (userType === 'admin') {
       navigate('/admin-login');
