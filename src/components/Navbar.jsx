@@ -10,6 +10,7 @@ import {
   FaTimes,
   FaSignOutAlt
 } from 'react-icons/fa';
+import logo from '../assets/logo.png';
 
 export default function Navbar() {
   const location = useLocation();
@@ -95,10 +96,10 @@ export default function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center hover:opacity-80">
-              <FaGraduationCap className="h-8 w-8 text-red-200" />
-              <span className="ml-2 text-xl font-bold">CFTL LMS</span>
-            </Link>
+<Link to="/" className="flex-shrink-0 flex items-center hover:opacity-80">
+  <img src={logo} alt="CFTL Logo" className="h-10 w-auto" />
+</Link>
+
             <div className="hidden md:block ml-10">
               <div className="flex space-x-4">
                 {navItems.map((item) => (
