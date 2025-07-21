@@ -2,8 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight, FaUserFriends } from 'react-icons/fa';
 import backgroundImage from '../../assets/pexels-lum3n-44775-167682.jpg';
+
 
 export default function ParentLogin() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -45,14 +46,11 @@ export default function ParentLogin() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <div className="text-center mb-6">
-          <img
-            src="../../assets/logo.jpg"
-            alt="CFTL Logo"
-            className="mx-auto h-16 mb-2"
-          />
-          <h2 className="text-2xl font-bold">COLLEGE OF FAST TRACK LEARNING</h2>
-        </div>
+<div className="text-center mb-6">
+  <FaUserFriends className="mx-auto text-4xl mb-3 text-white" />
+  <h2 className="text-2xl font-bold">PARENT LOGIN</h2>
+</div>
+
 
         {error && (
           <div className="mb-4 p-3 bg-red-500 bg-opacity-80 text-white rounded-md text-sm">

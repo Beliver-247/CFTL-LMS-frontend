@@ -8,7 +8,6 @@ import {
   FaFileAlt,
   FaMoneyBillWave,
   FaClipboardList,
-  FaSignOutAlt,
   FaUser,
   FaPhone,
   FaSchool,

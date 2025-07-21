@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import loginBg from '../assets/pexels-lum3n-44775-167682.jpg'; 
+import logo from '../assets/textLogo.png'; // Assuming you have a logo image
 
 export default function UserLogin() {
   return (
@@ -26,15 +27,15 @@ export default function UserLogin() {
           transition={{ duration: 1 }}
         >
           <div className="mb-6">
-            <div className="bg-white rounded p-3 inline-block">
-              <div className="text-red-800 font-bold text-xl">CFTL</div>
-            </div>
+<img src={logo} alt="CFTL Logo" className="mx-auto h-16 md:h-20 lg:h-24 w-auto" />
+
+
           </div>
-          <h1 className="text-3xl font-bold mb-4">COLLEGE OF FAST TRACK LEARNING</h1>
-          <p className="text-sm text-red-100 max-w-md">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-            Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.
-          </p>
+          {/* <h1 className="text-3xl font-bold mb-4">COLLEGE OF FAST TRACK LEARNING</h1> */}
+<p className="text-sm text-red-100 max-w-md">
+  Join a community where ambition meets opportunity. At CFTL, we empower learners to fast-track their academic journey with cutting-edge digital tools, expert guidance, and nationally recognized programs.
+</p>
+
         </motion.div>
       </div>
 
