@@ -8,52 +8,56 @@ export default function RedirectIfAuthenticated({ children }) {
   const [redirectPath, setRedirectPath] = useState(null);
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          const token = await user.getIdToken();
-          localStorage.setItem("adminToken", token);
+useEffect(() => {
+  const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      try {
+        const token = await user.getIdToken();
+        localStorage.setItem("adminToken", token);
 
-          const res = await axios.get(`${baseURL}/api/admins/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+        const res = await axios.get(`${baseURL}/api/admins/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-          const { fullName, nameInitials, telephone, role } = res.data || {};
+        const { fullName, nameInitials, telephone, role } = res.data || {};
+        const isProfileIncomplete =
+          !fullName?.trim() || !nameInitials?.trim() || !telephone?.trim();
 
-          const isProfileIncomplete =
-            !fullName?.trim() || !nameInitials?.trim() || !telephone?.trim();
+        if (isProfileIncomplete) {
+          setRedirectPath('/admin-complete-profile');
+        } else {
+          // 🧠 Use activeRole override if it exists
+          const activeRole = localStorage.getItem('activeRole') || role;
 
-          if (isProfileIncomplete) {
-            setRedirectPath('/admin-complete-profile');
-          } else if (role === 'coordinator') {
+          if (activeRole === 'coordinator') {
             setRedirectPath('/coordinator-dashboard');
-          } else if (role === 'admin') {
+          } else if (activeRole === 'admin') {
             setRedirectPath('/admin-dashboard');
           } else {
-            // Unknown role fallback
             setRedirectPath('/');
           }
-        } catch (err) {
-          if (err.response?.status === 404) {
-            // Invited user or no profile
-            setRedirectPath('/admin-complete-profile');
-          } else {
-            console.error('Redirect failed:', err);
-            localStorage.removeItem("adminToken");
-            await auth.signOut();
-            setRedirectPath('/admin-login');
-          }
-        } finally {
-          setLoading(false); // ✅ Ensure this runs regardless
         }
-      } else {
-        setLoading(false); // Not logged in
+      } catch (err) {
+        if (err.response?.status === 404) {
+          // Invited user or no profile
+          setRedirectPath('/admin-complete-profile');
+        } else {
+          console.error('Redirect failed:', err);
+          localStorage.removeItem("adminToken");
+          await auth.signOut();
+          setRedirectPath('/admin-login');
+        }
+      } finally {
+        setLoading(false); // ✅ Ensure this runs regardless
       }
-    });
+    } else {
+      setLoading(false); // Not logged in
+    }
+  });
 
-    return () => unsubscribe();
-  }, []);
+  return () => unsubscribe();
+}, []);
+
 
   if (loading) return null;
   if (redirectPath) return <Navigate to={redirectPath} replace />;
