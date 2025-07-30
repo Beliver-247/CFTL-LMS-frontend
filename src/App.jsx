@@ -11,7 +11,7 @@ import ParentRegister from "./pages/ParentPages/ParentRegistration";
 import ParentDashboard from "./pages/ParentPages/ParentDashboard";
 import StudentRegister from "./pages/StudentPages/StudentRegister";
 import ProtectedRoute from "./components/ProtectedRoute";
-import TeacherProtectedRoute from "./components/TeacherProtectedRoute"; 
+import TeacherProtectedRoute from "./components/TeacherProtectedRoute";
 import AdminLogin from "./pages/AdminPages/AdminLogin";
 import AdminCompleteProfile from "./pages/AdminPages/AdminProfileForm";
 import AdminDashboard from "./pages/AdminPages/AdminDashboard";
@@ -61,9 +61,9 @@ export default function App() {
           />
           <Route path="/teacher-modules" element={<TeacherModules />} />
           <Route
-  path="/teacher/courses/:courseId/update-status"
-  element={<TeacherProtectedRoute element={UpdateCourseStatus} />}
-/>
+            path="/teacher/courses/:courseId/update-status"
+            element={<TeacherProtectedRoute element={UpdateCourseStatus} />}
+          />
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
           <Route path="/payment-status" element={<PaymentStatusMy />} />
@@ -82,14 +82,14 @@ export default function App() {
             }
           />
           <Route
-  path="/coordinator/courses/:courseId/approve-syllabus"
-  element={
-    <ProtectedRoute
-      element={CoordinatorSyllabusApproval}
-      allowedRoles={["coordinator"]}
-    />
-  }
-/>
+            path="/coordinator/courses/:courseId/approve-syllabus"
+            element={
+              <ProtectedRoute
+                element={CoordinatorSyllabusApproval}
+                allowedRoles={["coordinator"]}
+              />
+            }
+          />
 
           <Route
             path="/coordinator/manage-payment-requests"
@@ -203,7 +203,7 @@ export default function App() {
             element={
               <ProtectedRoute
                 element={CoordinatorDashboard}
-                allowedRoles={["coordinator"]}
+                allowedRoles={["coordinator","admin"]}
               />
             }
           />

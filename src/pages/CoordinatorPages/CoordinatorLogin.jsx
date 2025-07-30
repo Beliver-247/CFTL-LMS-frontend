@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
-import { auth } from '../../firebase';
+import { useState, useEffect } from "react";
+import { auth } from "../../firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-} from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { motion } from 'framer-motion';
-import { FaUserTie, FaEnvelope, FaLock } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
-import backgroundImage from '../../assets/pexels-lum3n-44775-167682.jpg';
+} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { FaUserTie, FaEnvelope, FaLock } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import backgroundImage from "../../assets/pexels-lum3n-44775-167682.jpg";
 
 export default function CoordinatorLogin() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
@@ -33,8 +33,8 @@ export default function CoordinatorLogin() {
         });
 
         const { role } = res.data || {};
-        if (role === 'coordinator') {
-          navigate('/coordinator-dashboard');
+        if (role === "coordinator") {
+          navigate("/coordinator-dashboard");
         }
       } catch {}
     };
@@ -44,60 +44,64 @@ export default function CoordinatorLogin() {
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCred.user.getIdToken();
-      localStorage.setItem('adminToken', token);
-      localStorage.setItem('userRole', 'coordinator');
-      localStorage.setItem('activeRole', 'coordinator');
+      localStorage.setItem("adminToken", token);
+      localStorage.setItem("userRole", "coordinator");
+      localStorage.setItem("activeRole", "coordinator");
 
       const res = await axios.get(`${baseURL}/api/admins/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const { role } = res.data || {};
-      if (role !== 'coordinator') {
-        setError('Access denied. You are not a coordinator.');
+      if (role === "coordinator" || role === "admin") {
+        navigate("/coordinator-dashboard");
+      } else {
+        setError("Access denied. You are not authorized.");
         await auth.signOut();
-        localStorage.removeItem('adminToken');
+        localStorage.removeItem("adminToken");
         return;
       }
 
-      navigate('/coordinator-dashboard');
+      navigate("/coordinator-dashboard");
     } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
+      setError(err.message.replace("Firebase: ", ""));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError('');
+    setError("");
     setGoogleLoading(true);
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const token = await result.user.getIdToken();
-      localStorage.setItem('adminToken', token);
-      localStorage.setItem('userRole', 'coordinator');
-      localStorage.setItem('activeRole', 'coordinator');
-      const res = await axios.get(`${baseURL}/api/admins/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+const res = await axios.get(`${baseURL}/api/admins/me`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
 
-      const { role } = res.data || {};
-      if (role !== 'coordinator') {
-        setError('Access denied. You are not a coordinator.');
-        await auth.signOut();
-        localStorage.removeItem('adminToken');
-        return;
-      }
+const { role } = res.data || {};
+if (role !== 'coordinator' && role !== 'admin') {
+  setError('Access denied.');
+  await auth.signOut();
+  localStorage.removeItem('adminToken');
+  return;
+}
 
-      navigate('/coordinator-dashboard');
+localStorage.setItem('adminToken', token);
+localStorage.setItem('userRole', role); // Use actual role
+localStorage.setItem('activeRole', 'coordinator'); // Still acting as coordinator
+
+navigate('/coordinator-dashboard');
+
     } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
+      setError(err.message.replace("Firebase: ", ""));
     } finally {
       setGoogleLoading(false);
     }
@@ -114,7 +118,7 @@ export default function CoordinatorLogin() {
         className="relative z-10 bg-white bg-opacity-10 backdrop-blur-md rounded-2xl shadow-lg p-8 max-w-md w-full text-white"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="text-center mb-6">
           <FaUserTie className="mx-auto text-4xl mb-3" />
@@ -151,7 +155,7 @@ export default function CoordinatorLogin() {
             disabled={isLoading}
             className="w-full py-3 rounded-full bg-red-700 hover:bg-red-600 transition-colors font-semibold flex justify-center items-center"
           >
-            {isLoading ? 'Signing in...' : 'LOGIN'}
+            {isLoading ? "Signing in..." : "LOGIN"}
           </button>
         </form>
 
@@ -162,13 +166,22 @@ export default function CoordinatorLogin() {
             disabled={googleLoading}
             className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-full text-gray-800 bg-white hover:bg-gray-50"
           >
-            {googleLoading ? 'Signing in...' : <><FcGoogle className="mr-2" /> Google</>}
+            {googleLoading ? (
+              "Signing in..."
+            ) : (
+              <>
+                <FcGoogle className="mr-2" /> Google
+              </>
+            )}
           </button>
         </div>
 
         <div className="mt-6 text-center text-sm text-gray-200">
-          Not a coordinator?{' '}
-          <a href="/admin-login" className="text-blue-300 hover:underline font-medium">
+          Not a coordinator?{" "}
+          <a
+            href="/admin-login"
+            className="text-blue-300 hover:underline font-medium"
+          >
             Go to Admin Login
           </a>
         </div>
