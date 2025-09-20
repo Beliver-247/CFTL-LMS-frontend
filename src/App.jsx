@@ -42,6 +42,8 @@ import AssignCoursesToTeacher from "./pages/AdminPages/AssignCoursesToTeachers";
 import TeacherModules from "./pages/TeacherPages/TeacherModules";
 import UpdateCourseStatus from "./pages/TeacherPages/UpdateCourseStatus";
 import CoordinatorSyllabusApproval from "./pages/CoordinatorPages/CoordinatorSyllabusApproval";
+import PendingRegistrations from "./pages/AdminPages/PendingRegistrations";
+import CoordinatorPendingRegistrations from "./pages/CoordinatorPages/CoordinatorPendingRegistrations";
 
 export default function App() {
   return (
@@ -112,6 +114,15 @@ export default function App() {
             element={
               <ProtectedRoute
                 element={SyllabusCourseList}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
+          <Route
+            path="/admin/pending-registrations"
+            element={
+              <ProtectedRoute
+                element={PendingRegistrations}
                 allowedRoles={["admin"]}
               />
             }
@@ -203,6 +214,15 @@ export default function App() {
             element={
               <ProtectedRoute
                 element={CoordinatorDashboard}
+                allowedRoles={["coordinator","admin"]}
+              />
+            }
+          />
+          <Route
+            path="/coordinator/pending-registrations"
+            element={
+              <ProtectedRoute
+                element={CoordinatorPendingRegistrations}
                 allowedRoles={["coordinator","admin"]}
               />
             }

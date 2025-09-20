@@ -1,39 +1,41 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api"
 
 export default function CreateSubject() {
   const [form, setForm] = useState({
-    subjectName: '',
-    program: '',
-    stream: '',
+    subjectName: "",
+    program: "",
+    stream: "",
+    isMandatory: false, // Only for OL
   });
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem('adminToken');
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Clear stream when program changes to OL
-    if (name === 'program' && value === 'OL') {
-      setForm(prev => ({ ...prev, stream: '' }));
+    // If program becomes OL, clear stream and keep isMandatory visible
+    if (name === "program" && value === "OL") {
+      setForm((prev) => ({ ...prev, stream: "" }));
+    }
+    // If program becomes AL, clear isMandatory (not used)
+    if (name === "program" && value === "AL") {
+      setForm((prev) => ({ ...prev, isMandatory: false }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const payload = {
@@ -41,29 +43,36 @@ export default function CreateSubject() {
         program: form.program.trim().toUpperCase(),
       };
 
-      if (form.program === 'AL') {
+      if (!payload.subjectName || !payload.program) {
+        setError("Subject name and program are required.");
+        return;
+      }
+
+      if (payload.program === "AL") {
         if (!form.stream) {
-          setError('Stream is required for AL program');
+          setError("Stream is required for AL.");
           return;
         }
         payload.stream = form.stream.trim().toLowerCase();
+      } else {
+        // OL
+        payload.isMandatory = !!form.isMandatory; // backend supports this
       }
 
-      await axios.post(`${baseURL}/api/subjects`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`/api/subjects`, payload);
 
-      setSuccess('Subject created successfully!');
-      setForm({ subjectName: '', program: '', stream: '' });
+      setSuccess("Subject created successfully!");
+      setForm({ subjectName: "", program: "", stream: "", isMandatory: false });
 
-      // Optional redirect:
-      // navigate('/admin/subjects');
+      // Optional redirect
+      // navigate("/admin/subjects");
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create subject');
+      setError(err?.response?.data?.error || "Failed to create subject");
     }
   };
 
-  const showStreamField = form.program === 'AL';
+  const showStream = form.program === "AL";
+  const showIsMandatory = form.program === "OL";
 
   return (
     <div className="p-6 max-w-lg mx-auto">
@@ -101,9 +110,9 @@ export default function CreateSubject() {
           </select>
         </div>
 
-        {showStreamField && (
+        {showStream && (
           <div>
-            <label className="block font-medium mb-1">Stream</label>
+            <label className="block font-medium mb-1">Stream (AL)</label>
             <select
               name="stream"
               value={form.stream}
@@ -118,6 +127,21 @@ export default function CreateSubject() {
               <option value="art">Art</option>
               <option value="commerce">Commerce</option>
             </select>
+          </div>
+        )}
+
+        {showIsMandatory && (
+          <div className="flex items-center gap-2">
+            <input
+              id="isMandatory"
+              type="checkbox"
+              name="isMandatory"
+              checked={form.isMandatory}
+              onChange={handleChange}
+            />
+            <label htmlFor="isMandatory" className="font-medium">
+              Mandatory subject (OL)
+            </label>
           </div>
         )}
 
