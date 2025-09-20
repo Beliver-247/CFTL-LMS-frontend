@@ -103,6 +103,12 @@ export default function CoordinatorDashboard() {
             >
               Register Student
             </button>
+              <button
+    onClick={() => navigate("/coordinator/pending-registrations")}
+    className="bg-yellow-700 text-white px-6 py-2 rounded-lg hover:bg-yellow-800 transition"
+  >
+    Pending Registrations
+  </button>
           </div>
         </motion.div>
 
