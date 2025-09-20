@@ -38,7 +38,7 @@ import UserLogin from "./pages/UserLogin";
 import ViewRegistrationRequests from "./pages/AdminPages/ViewRegistrationRequests";
 import SyllabusCourseList from "./pages/AdminPages/syllabusCourseList";
 import ManageCourseSyllabus from "./pages/AdminPages/ManageCourseSyllabus";
-import AssignCoursesToTeacher from "./pages/AdminPages/AssignCoursesToTeachers";
+import AssignSubjectsToTeachers from "./pages/AdminPages/AssignSubjectsToTeachers";
 import TeacherModules from "./pages/TeacherPages/TeacherModules";
 import UpdateCourseStatus from "./pages/TeacherPages/UpdateCourseStatus";
 import CoordinatorSyllabusApproval from "./pages/CoordinatorPages/CoordinatorSyllabusApproval";
@@ -137,10 +137,10 @@ export default function App() {
             }
           />
           <Route
-            path="/admin/assign-courses-to-teacher"
+            path="/admin/assign-subjects-to-teacher"
             element={
               <ProtectedRoute
-                element={AssignCoursesToTeacher}
+                element={AssignSubjectsToTeachers}
                 allowedRoles={["admin"]}
               />
             }

@@ -82,10 +82,10 @@ export default function AdminDashboard() {
       onClick: () => navigate("/admin/manage-courses"),
     },
     {
-  title: "Assign Teachers to Courses",
+  title: "Assign Teachers to Subjects",
   icon: <FaChalkboardTeacher className="text-red-700 text-2xl" />,
   description: "Assign courses to teachers",
-  onClick: () => navigate("/admin/assign-courses-to-teacher"),
+  onClick: () => navigate("/admin/assign-subjects-to-teacher"),
 },
     {
       title: "Manage Subjects",
