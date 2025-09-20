@@ -26,72 +26,8 @@ export default function BasicInformation({ form, handleChange, errors }) {
             className="w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-700 rounded-md shadow-sm focus:outline-none cursor-not-allowed"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Registration Fee (LKR)
-          </label>
-          <input
-            type="number"
-            name="registrationFee"
-            value={form.registrationFee}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.registrationFee && (
-            <p className="text-red-500 text-sm">
-              {errors.registrationFee}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Monthly Fee (LKR)
-          </label>
-          <input
-            type="number"
-            name="monthlyFee"
-            value={form.monthlyFee}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.monthlyFee && (
-            <p className="text-red-500 text-sm">{errors.monthlyFee}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Pre Budget (LKR)
-          </label>
-          <input
-            type="number"
-            name="preBudget"
-            value={form.preBudget}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.preBudget && (
-            <p className="text-red-500 text-sm">{errors.preBudget}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Total Amount (LKR)
-          </label>
-          <input
-            type="number"
-            name="totalAmount"
-            value={form.totalAmount}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.totalAmount && (
-            <p className="text-red-500 text-sm">{errors.totalAmount}</p>
-          )}
-        </div>
+
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Name in FULL (BLOCK LETTERS)
@@ -219,19 +155,6 @@ export default function BasicInformation({ form, handleChange, errors }) {
             value={form.previousSchool}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Subjects (comma separated)
-          </label>
-          <input
-            type="text"
-            name="subjects"
-            value={form.subjects}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., Mathematics, Science, English"
           />
         </div>
       </div>
