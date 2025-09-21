@@ -36,14 +36,15 @@ import ManagePaymentRequests from "./pages/CoordinatorPages/ManagePaymentRequest
 import ViewPaymentStatus from "./pages/ParentPages/ViewPaymentStatus";
 import UserLogin from "./pages/UserLogin";
 import ViewRegistrationRequests from "./pages/AdminPages/ViewRegistrationRequests";
-import SyllabusCourseList from "./pages/AdminPages/syllabusCourseList";
-import ManageCourseSyllabus from "./pages/AdminPages/ManageCourseSyllabus";
-import AssignCoursesToTeacher from "./pages/AdminPages/AssignCoursesToTeachers";
+import SyllabusSubjectList from "./pages/AdminPages/syllabusSubjectList";
+import ManageSubjectSyllabus from "./pages/AdminPages/ManageSubjectSyllabus";
+import AssignSubjectsToTeachers from "./pages/AdminPages/AssignSubjectsToTeachers";
 import TeacherModules from "./pages/TeacherPages/TeacherModules";
-import UpdateCourseStatus from "./pages/TeacherPages/UpdateCourseStatus";
+import UpdateSubjectStatus from "./pages/TeacherPages/UpdateSubjectStatus";
 import CoordinatorSyllabusApproval from "./pages/CoordinatorPages/CoordinatorSyllabusApproval";
 import PendingRegistrations from "./pages/AdminPages/PendingRegistrations";
 import CoordinatorPendingRegistrations from "./pages/CoordinatorPages/CoordinatorPendingRegistrations";
+import CoordinatorCourseSubjects from "./pages/CoordinatorPages/CoordinatorCourseSubjects";
 
 export default function App() {
   return (
@@ -63,8 +64,8 @@ export default function App() {
           />
           <Route path="/teacher-modules" element={<TeacherModules />} />
           <Route
-            path="/teacher/courses/:courseId/update-status"
-            element={<TeacherProtectedRoute element={UpdateCourseStatus} />}
+            path="/teacher/subjects/:subjectId/update-status"
+            element={<TeacherProtectedRoute element={UpdateSubjectStatus} />}
           />
           <Route path="/parent-register" element={<ParentRegister />} />
           <Route path="/parent-dashboard" element={<ParentDashboard />} />
@@ -84,7 +85,7 @@ export default function App() {
             }
           />
           <Route
-            path="/coordinator/courses/:courseId/approve-syllabus"
+            path="/coordinator/subjects/:subjectId/approve-syllabus"
             element={
               <ProtectedRoute
                 element={CoordinatorSyllabusApproval}
@@ -92,6 +93,17 @@ export default function App() {
               />
             }
           />
+
+          <Route
+  path="/coordinator/courses/:courseId/syllabus-requests"
+  element={
+    <ProtectedRoute
+      element={CoordinatorCourseSubjects}
+      allowedRoles={["coordinator","admin"]}
+    />
+  }
+/>
+
 
           <Route
             path="/coordinator/manage-payment-requests"
@@ -110,10 +122,10 @@ export default function App() {
             }
           />
           <Route
-            path="/admin/syllabus-courses"
+            path="/admin/subjects"
             element={
               <ProtectedRoute
-                element={SyllabusCourseList}
+                element={SyllabusSubjectList}
                 allowedRoles={["admin"]}
               />
             }
@@ -128,19 +140,19 @@ export default function App() {
             }
           />
           <Route
-            path="/admin/courses/:courseId/syllabus"
+            path="/admin/subjects/:subjectId/syllabus"
             element={
               <ProtectedRoute
-                element={ManageCourseSyllabus}
+                element={ManageSubjectSyllabus}
                 allowedRoles={["admin"]}
               />
             }
           />
           <Route
-            path="/admin/assign-courses-to-teacher"
+            path="/admin/assign-subjects-to-teacher"
             element={
               <ProtectedRoute
-                element={AssignCoursesToTeacher}
+                element={AssignSubjectsToTeachers}
                 allowedRoles={["admin"]}
               />
             }

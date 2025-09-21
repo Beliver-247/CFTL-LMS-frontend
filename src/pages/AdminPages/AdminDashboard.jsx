@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
+// import { auth } from "../../firebase"; // ❌ unused — remove
 import { getFreshToken } from "../../utils/authToken";
 import { motion } from "framer-motion";
 import { FaUsers, FaChalkboardTeacher, FaBookOpen, FaClipboardList, FaMoneyCheckAlt } from "react-icons/fa";
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
     };
 
     fetchAdmin();
-  }, [navigate]);
+  }, [navigate]); // (optional) add baseURL if your linter requires: [navigate, baseURL]
 
   if (error)
     return (
@@ -72,8 +72,8 @@ export default function AdminDashboard() {
     {
       title: "Manage Syllabus",
       icon: <FaClipboardList className="text-red-700 text-2xl" />,
-      description: "Edit curriculum and course content",
-      onClick: () => navigate("/admin/syllabus-courses"),
+      description: "Create and edit syllabi by subject", // ✅ wording
+      onClick: () => navigate("/admin/subjects"), // ✅ new subject-based route
     },
     {
       title: "Manage Courses",
@@ -82,11 +82,11 @@ export default function AdminDashboard() {
       onClick: () => navigate("/admin/manage-courses"),
     },
     {
-  title: "Assign Teachers to Courses",
-  icon: <FaChalkboardTeacher className="text-red-700 text-2xl" />,
-  description: "Assign courses to teachers",
-  onClick: () => navigate("/admin/assign-courses-to-teacher"),
-},
+      title: "Assign Teachers to Subjects",
+      icon: <FaChalkboardTeacher className="text-red-700 text-2xl" />,
+      description: "Assign subjects to teachers", // ✅ wording
+      onClick: () => navigate("/admin/assign-subjects-to-teacher"),
+    },
     {
       title: "Manage Subjects",
       icon: <FaBookOpen className="text-red-700 text-2xl" />,
@@ -132,13 +132,13 @@ export default function AdminDashboard() {
             >
               Register Student
             </button>
-            <button
-  onClick={() => navigate("/admin/pending-registrations")}
-  className="bg-yellow-700 text-white px-6 py-2 rounded-lg hover:bg-yellow-800 transition"
->
-  Pending Registrations
-</button>
 
+            <button
+              onClick={() => navigate("/admin/pending-registrations")}
+              className="bg-yellow-700 text-white px-6 py-2 rounded-lg hover:bg-yellow-800 transition"
+            >
+              Pending Registrations
+            </button>
           </div>
         </motion.div>
 
@@ -161,6 +161,7 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
+
       {showMonthsModal && (
         <UpdateStartingMonthModal onClose={() => setShowMonthsModal(false)} />
       )}
