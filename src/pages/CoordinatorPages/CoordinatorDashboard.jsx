@@ -150,14 +150,21 @@ export default function CoordinatorDashboard() {
       >
         View Students
       </button>
-      <button
-        onClick={() =>
-          navigate(`/coordinator/courses/${course.id}/approve-syllabus`)
-        }
-        className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition"
-      >
-        Syllabus Requests
-      </button>
+<button
+  onClick={() =>
+    navigate(`/coordinator/courses/${course.id}/syllabus-requests`, {
+      state: {
+        program: (course.program || "").toUpperCase(),
+        // valid streams: biology | maths | tech | art | commerce
+        stream: (course.stream || "").toLowerCase(),
+      },
+    })
+  }
+  className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition"
+>
+  Syllabus Requests
+</button>
+
     </div>
   </motion.div>
 ))}
