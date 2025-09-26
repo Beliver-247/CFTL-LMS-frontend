@@ -67,7 +67,7 @@ export default function AdminDashboard() {
       title: "Manage Teachers",
       icon: <FaChalkboardTeacher className="text-red-700 text-2xl" />,
       description: "Assign subjects or edit teacher info",
-      onClick: () => alert("Manage Teachers"),
+      onClick: () => navigate("/admin/manage-teachers"),
     },
     {
       title: "Manage Syllabus",

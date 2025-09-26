@@ -45,6 +45,7 @@ import CoordinatorSyllabusApproval from "./pages/CoordinatorPages/CoordinatorSyl
 import PendingRegistrations from "./pages/AdminPages/PendingRegistrations";
 import CoordinatorPendingRegistrations from "./pages/CoordinatorPages/CoordinatorPendingRegistrations";
 import CoordinatorCourseSubjects from "./pages/CoordinatorPages/CoordinatorCourseSubjects";
+import ManageTeachers from "./pages/TeacherPages/ManageTeachers";
 
 export default function App() {
   return (
@@ -157,6 +158,12 @@ export default function App() {
               />
             }
           />
+             <Route
+    path="/admin/manage-teachers"
+    element={
+      <ProtectedRoute element={ManageTeachers} allowedRoles={["admin"]} />
+    }
+  />
 
           <Route
             path="/coordinator-login"

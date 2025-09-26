@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
 import {
   FaChalkboardTeacher,
   FaBook,
@@ -8,7 +9,6 @@ import {
   FaFileAlt,
   FaMoneyBillWave,
   FaClipboardList,
-  FaSignOutAlt,
   FaUser,
   FaEnvelope,
   FaGraduationCap,
@@ -36,25 +36,21 @@ export default function TeacherDashboard() {
         const res = await axios.get(`${baseURL}/api/teachers/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setProfile(res.data);
       } catch (err) {
         if (err.response?.status === 404) {
-          // No profile exists – redirect to complete it
           return navigate("/teacher-complete-profile");
         }
-
         setError(err.response?.data?.error || "Failed to fetch teacher profile.");
       }
     };
 
     fetchProfile();
-  }, [navigate]);
-
+  }, [navigate, baseURL]);
 
   if (error)
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-gray-900">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -63,30 +59,33 @@ export default function TeacherDashboard() {
 
   if (!profile)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-700"></div>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <header className="bg-blue-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <FaChalkboardTeacher className="text-3xl" />
-              <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
-            </div>
+      <header className="bg-gray-950/70 backdrop-blur border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FaChalkboardTeacher className="text-red-500 text-3xl" />
+            <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
           </div>
         </div>
       </header>
 
-      {/* Profile Overview */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <FaUser className="mr-2 text-blue-600" />
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* Profile Overview */}
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white text-gray-900 rounded-3xl shadow-xl overflow-hidden mb-8 p-6"
+        >
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <FaUser className="text-red-600" />
             My Profile
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -96,67 +95,63 @@ export default function TeacherDashboard() {
             <ProfileItem
               icon={<FaDollarSign />}
               label="Salary"
-              value={`LKR ${profile.salary?.toLocaleString()}`}
+              value={typeof profile.salary === "number" ? `LKR ${profile.salary.toLocaleString()}` : profile.salary}
             />
-            {profile.qualifications?.length > 0 && (
+            {Array.isArray(profile.qualifications) && profile.qualifications.length > 0 && (
               <div className="md:col-span-2 flex items-start">
                 <FaGraduationCap className="text-gray-400 mr-3 mt-1" />
                 <div>
                   <p className="text-sm text-gray-500">Qualifications</p>
-                  <p className="font-medium">
+                  <p className="font-medium text-gray-900">
                     {profile.qualifications.join(", ")}
                   </p>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </motion.section>
 
         {/* Dashboard Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <ActionCard
-            icon={<FaBook className="text-blue-600 text-xl" />}
-            title="My Modules"
-            subtitle="View and manage your modules"
-            onClick={() => navigate("/teacher-modules")}
-            bg="bg-blue-100"
-          />
-          <ActionCard
-            icon={<FaFileAlt className="text-green-600 text-xl" />}
-            title="View Syllabus"
-            subtitle="Access course syllabi"
-            onClick={() => navigate("/syllabus")}
-            bg="bg-green-100"
-          />
-          <ActionCard
-            icon={<FaCalendarAlt className="text-purple-600 text-xl" />}
-            title="Exam Timetables"
-            subtitle="View exam schedules"
-            onClick={() => navigate("/exam-timetables")}
-            bg="bg-purple-100"
-          />
-          <ActionCard
-            icon={<FaCalendarAlt className="text-yellow-600 text-xl" />}
-            title="Academic Timetables"
-            subtitle="View class schedules"
-            onClick={() => navigate("/academic-timetables")}
-            bg="bg-yellow-100"
-          />
-          <ActionCard
-            icon={<FaMoneyBillWave className="text-red-600 text-xl" />}
-            title="Payment Status"
-            subtitle="Check your payment history"
-            onClick={() => navigate("/payment-status")}
-            bg="bg-red-100"
-          />
-          <ActionCard
-            icon={<FaClipboardList className="text-indigo-600 text-xl" />}
-            title="Update Payment Info"
-            subtitle="Manage your bank details"
-            onClick={() => navigate("/update-payment-details")}
-            bg="bg-indigo-100"
-          />
-        </div>
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ActionCard
+              icon={<FaBook className="text-red-700 text-xl" />}
+              title="My Modules"
+              subtitle="View and manage your modules"
+              onClick={() => navigate("/teacher-modules")}
+            />
+            <ActionCard
+              icon={<FaFileAlt className="text-red-700 text-xl" />}
+              title="View Syllabus"
+              subtitle="Access course syllabi"
+              onClick={() => navigate("/syllabus")}
+            />
+            <ActionCard
+              icon={<FaCalendarAlt className="text-red-700 text-xl" />}
+              title="Exam Timetables"
+              subtitle="View exam schedules"
+              onClick={() => navigate("/exam-timetables")}
+            />
+            <ActionCard
+              icon={<FaCalendarAlt className="text-red-700 text-xl" />}
+              title="Academic Timetables"
+              subtitle="View class schedules"
+              onClick={() => navigate("/academic-timetables")}
+            />
+            <ActionCard
+              icon={<FaMoneyBillWave className="text-red-700 text-xl" />}
+              title="Payment Status"
+              subtitle="Check your payment history"
+              onClick={() => navigate("/payment-status")}
+            />
+            <ActionCard
+              icon={<FaClipboardList className="text-red-700 text-xl" />}
+              title="Update Payment Info"
+              subtitle="Manage your bank details"
+              onClick={() => navigate("/update-payment-details")}
+            />
+          </div>
+        </section>
       </main>
     </div>
   );
@@ -174,19 +169,23 @@ function ProfileItem({ icon, label, value }) {
   );
 }
 
-function ActionCard({ icon, title, subtitle, onClick, bg }) {
+function ActionCard({ icon, title, subtitle, onClick }) {
   return (
-    <div
+    <motion.button
+      type="button"
       onClick={onClick}
-      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="bg-white text-gray-900 rounded-3xl shadow-xl hover:shadow-2xl active:scale-[0.99] transition-all text-left"
     >
       <div className="p-6 flex items-center">
-        <div className={`${bg} p-3 rounded-full mr-4`}>{icon}</div>
+        <div className="bg-red-50 p-3 rounded-full mr-4">{icon}</div>
         <div>
           <h3 className="font-semibold text-lg">{title}</h3>
-          <p className="text-gray-500 text-sm">{subtitle}</p>
+          <p className="text-gray-600 text-sm">{subtitle}</p>
         </div>
       </div>
-    </div>
+    </motion.button>
   );
 }
